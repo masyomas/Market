@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🛠️ لوحة الإدارة</title>
 <style>
 body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff;}
 header { background:#6c757d; color:#fff; padding:12px; font-size:20px; text-align:center;}
 nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px; border-top:1px solid #ddd; border-bottom:1px solid #ddd;}
-nav a { text-decoration:none; color:#333; font-size:14px;}
+nav a { text-decoration:none; color:#333; font-size:14px; cursor:pointer;}
 nav a:hover { color:#007bff;}
 section { margin:10px auto; width:95%; max-width:800px;}
 h3 { background:#007bff; color:#fff; padding:6px; border-radius:4px; font-size:17px;}
@@ -17,7 +17,7 @@ button { background:#28a745; color:#fff; padding:6px 10px; border:none; border-r
 button:hover { background:#218838;}
 .logoutBtn { background:#dc3545; }
 .logoutBtn:hover { background:#c82333;}
-.restoreBtn { background:#ffc107; color:#000; }
+.restoreBtn { background:#ffc107; color:#000;}
 .restoreBtn:hover { background:#e0a800;}
 table { width:100%; border-collapse:collapse; margin-top:8px;}
 td, th { border:1px solid #ccc; padding:4px; font-size:13px; text-align:center;}
@@ -29,13 +29,18 @@ footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; col
 <header>🛠️ لوحة الإدارة</header>
 
 <nav>
-  <a href="index.html">🏠 المتجر</a>
-  <a href="salesReport.html">📊 مبيعاتي</a>
+  <a onclick="showTab('adminSection')">⚙️ لوحة الإدارة</a>
+  <a onclick="showTab('salesSection')">📊 مبيعاتي</a>
+  <a href="index.html">🏪 المتجر</a>
   <a href="register.html">🔑 حسابي</a>
 </nav>
 
 <section id="adminSection">
-  <!-- المحتوى سيظهر بعد التحقق -->
+  <!-- محتوى لوحة الإدارة يظهر هنا -->
+</section>
+
+<section id="salesSection" style="display:none;">
+  <!-- محتوى تقرير المبيعات يظهر هنا -->
 </section>
 
 <footer>💎 Powered by Almasa 💎</footer>
@@ -46,30 +51,32 @@ let users=JSON.parse(localStorage.getItem('users')||"[]");
 let products=JSON.parse(localStorage.getItem('products')||"[]");
 let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
 let bonus=parseFloat(localStorage.getItem('bonus')||"1");
-let superAdminPass="790707071"; // كلمة السر الثابتة
+let superAdminPass="790707071";
+
+function showTab(tab){
+  document.getElementById('adminSection').style.display = (tab==='adminSection')?'block':'none';
+  document.getElementById('salesSection').style.display = (tab==='salesSection')?'block':'none';
+  if(tab==='adminSection') renderAdmin();
+  else renderSales();
+}
 
 function renderAdmin(){
   if(!logged || (logged.role!=="superadmin" && logged.role!=="admin")){
     document.getElementById('adminSection').innerHTML='<p>🚫 لا تملك صلاحية الدخول هنا.</p>';
     return;
   }
-  let html="";
-  html+=`<h3>مرحبًا ${logged.name}</h3>
+  let html=`<h3>مرحبًا ${logged.name}</h3>
   <button class="logoutBtn" onclick="logout()">تسجيل خروج</button>`;
 
   if(logged.role==="superadmin"){
-    html+=`
-    <h3>إدارة المدراء</h3>
-    <table>
-      <tr><th>الاسم</th><th>الهاتف</th><th>الكود</th></tr>`;
-    users.forEach((u,idx)=>{
-      if(u.role==="admin"){
-        html+=`<tr>
-          <td>${u.name}</td>
-          <td><input type="text" value="${u.phone}" onchange="editAdmin(${idx},'phone',this.value)"></td>
-          <td><input type="number" value="${u.code}" onchange="editAdmin(${idx},'code',this.value)"></td>
-        </tr>`;
-      }
+    html+=`<h3>إعداد المدراء</h3>
+    <table><tr><th>الاسم</th><th>الهاتف</th><th>الكود</th></tr>`;
+    users.filter(u=>u.role==="admin").forEach((u,i)=>{
+      html+=`<tr>
+        <td>${u.name}</td>
+        <td><input type="text" value="${u.phone}" onchange="editAdmin(${i},'phone',this.value)"></td>
+        <td><input type="number" value="${u.code}" onchange="editAdmin(${i},'code',this.value)"></td>
+      </tr>`;
     });
     html+=`</table>
     <h3>نسبة البونص الحالية: ${bonus}%</h3>
@@ -77,8 +84,7 @@ function renderAdmin(){
     <button onclick="updateBonus()">تحديث النسبة</button>`;
   }
 
-  html+=`
-  <h3>إضافة سلعة جديدة</h3>
+  html+=`<h3>إضافة سلعة جديدة</h3>
   <input type="text" id="pName" placeholder="اسم السلعة">
   <input type="number" id="pPrice" placeholder="سعر السلعة">
   <input type="text" id="pDetails" placeholder="تفاصيل السلعة">
@@ -93,18 +99,26 @@ function renderAdmin(){
       html+=`<tr>
         <td><img src="${p.img||'https://via.placeholder.com/50'}" width="50"></td>
         <td>${p.name}</td>
-        <td><input type="number" value="${p.price}" onchange="editProduct(${i},'price',this.value)"></td>
+        <td>${p.price}</td>
         <td>${p.details}</td>
-        <td><button onclick="delProduct(${i})">🗑️</button></td>
-      </tr>`;
+        <td><button onclick="delProduct(${i})">🗑️</button></td></tr>`;
     });
     html+=`</table>`;
-  } else { html+=`<p>لا توجد سلع بعد.</p>`; }
+  } else html+=`<p>لا توجد سلع بعد.</p>`;
 
-  html+=`<h3>المبيعات</h3>`;
+  document.getElementById('adminSection').innerHTML=html;
+}
+
+function renderSales(){
+  if(!logged || (logged.role!=="superadmin" && logged.role!=="admin")){
+    document.getElementById('salesSection').innerHTML='<p>🚫 لا تملك صلاحية الدخول هنا.</p>';
+    return;
+  }
+  let html='<h3>جميع المبيعات</h3>';
   if(purchases.length){
     html+=`<table>
-    <tr><th>العميل</th><th>الهاتف</th><th>الكود</th><th>السلعة</th><th>الكمية</th><th>السعر</th><th>التاريخ</th><th>تم إلغاؤه؟</th></tr>`;
+    <tr><th>العميل</th><th>الهاتف</th><th>الكود</th><th>السلعة</th>
+    <th>الكمية</th><th>السعر</th><th>التاريخ</th><th>تم إلغاؤه؟</th></tr>`;
     purchases.forEach(p=>{
       html+=`<tr>
         <td>${p.name}</td>
@@ -114,14 +128,12 @@ function renderAdmin(){
         <td>${p.qty}</td>
         <td>${p.price}</td>
         <td>${p.date}</td>
-        <td>${p.cancelled?'✅':'❌'}</td>
-      </tr>`;
+        <td>${p.cancelled?'✅':'❌'}</td></tr>`;
     });
     html+=`</table>
     <button class="restoreBtn" onclick="restorePurchases()">استعادة حالة الجدول</button>`;
-  } else { html+=`<p>لا توجد مبيعات بعد.</p>`; }
-
-  document.getElementById('adminSection').innerHTML=html;
+  } else html+=`<p>📦 لا توجد مبيعات حتى الآن.</p>`;
+  document.getElementById('salesSection').innerHTML=html;
 }
 
 function addProduct(){
@@ -129,35 +141,35 @@ function addProduct(){
   let price=parseFloat(document.getElementById('pPrice').value);
   let details=document.getElementById('pDetails').value.trim();
   let imgInput=document.getElementById('pImg');
-  if(!name||!price||!details){ alert("❗ أدخل كل البيانات."); return;}
-  let reader=new FileReader();
-  reader.onload=function(e){
-    products.push({name,price,details,img:e.target.result});
-    localStorage.setItem('products', JSON.stringify(products));
-    renderAdmin();
-  };
-  if(imgInput.files.length){ reader.readAsDataURL(imgInput.files[0]); }
-  else { products.push({name,price,details,img:""}); localStorage.setItem('products', JSON.stringify(products)); renderAdmin();}
+  let img="";
+  if(imgInput.files.length){
+    let reader=new FileReader();
+    reader.onload=e=>{
+      img=e.target.result;
+      saveProduct(name,price,details,img);
+    };
+    reader.readAsDataURL(imgInput.files[0]);
+  } else saveProduct(name,price,details,"");
 }
-
+function saveProduct(name,price,details,img){
+  if(!name||!price||!details){ alert("❗ أكمل جميع البيانات."); return;}
+  products.push({name,price,details,img});
+  localStorage.setItem('products', JSON.stringify(products));
+  renderAdmin();
+}
 function delProduct(i){
-  if(confirm("⚠️ تأكيد حذف السلعة؟")){
+  if(confirm("⚠️ حذف السلعة؟")){
     products.splice(i,1);
     localStorage.setItem('products', JSON.stringify(products));
     renderAdmin();
   }
 }
-
-function editProduct(i,field,value){
-  products[i][field]=parseFloat(value)||products[i][field];
-  localStorage.setItem('products', JSON.stringify(products));
-}
-
-function editAdmin(idx,field,value){
-  users[idx][field]=value;
+function editAdmin(i,field,value){
+  let admins=users.filter(u=>u.role==="admin");
+  admins[i][field]=value;
+  users=users.map(u=>u.role==="admin"?admins.shift():u);
   localStorage.setItem('users', JSON.stringify(users));
 }
-
 function updateBonus(){
   let b=parseFloat(document.getElementById('bonusInput').value);
   if(isNaN(b)||b<0){ alert("❗ أدخل نسبة صحيحة."); return;}
@@ -165,22 +177,19 @@ function updateBonus(){
   bonus=b;
   renderAdmin();
 }
-
 function restorePurchases(){
   let pass=prompt("أدخل كلمة سر السوبر أدمين:");
   if(pass===superAdminPass){
     purchases.forEach(p=>delete p.cancelled);
     localStorage.setItem('purchases', JSON.stringify(purchases));
-    alert("✅ تم الاستعادة بنجاح.");
-    renderAdmin();
-  } else { alert("❌ كلمة سر خاطئة."); }
+    alert("✅ تم استعادة حالة المبيعات بنجاح.");
+    renderSales();
+  } else alert("❌ كلمة سر خاطئة.");
 }
-
 function logout(){
   localStorage.removeItem('loggedUser');
   location.href='register.html';
 }
-
 renderAdmin();
 </script>
 
