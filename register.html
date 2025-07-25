@@ -25,7 +25,7 @@ footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; col
   <a href="index.html">🏬 المتجر</a> |
   <a href="register.html">📝 التسجيل</a> |
   <a href="myPurchases.html">🛒 مشترياتي</a> |
-  <a href="admin.html">⚙️ الإدارة</a>
+  <a href="#" onclick="logoutUser()">🚪 تسجيل خروج</a>
 </nav>
 
 <main>
@@ -53,7 +53,6 @@ function registerUser(){
   let code = parseInt(document.getElementById('userCode').value.trim());
   let users = JSON.parse(localStorage.getItem('users') || "[]");
 
-  // التحقق
   if(name.split(' ').length < 3){
     alert("❌ يجب إدخال الاسم الثلاثي كاملًا");
     return;
@@ -94,13 +93,28 @@ function loginUser(){
   let users = JSON.parse(localStorage.getItem('users') || "[]");
   let found = users.find(u => u.phone === phone && u.code == code);
   if(found){
-    sessionStorage.setItem('loggedUser', JSON.stringify(found));
+    localStorage.setItem('loggedUser', JSON.stringify(found));
     alert("✅ تم تسجيل الدخول!");
     location.href = "myPurchases.html";
   } else {
     alert("❌ بيانات غير صحيحة");
   }
 }
+
+// تسجيل خروج
+function logoutUser(){
+  localStorage.removeItem('loggedUser');
+  alert("👋 تم تسجيل الخروج");
+  location.href = "register.html";
+}
+
+// التقاط تسجيل الخروج من تبويبة أخرى
+window.addEventListener('storage', function(e){
+  if(e.key === 'loggedUser' && e.newValue === null){
+    alert("👋 تم تسجيل خروجك في تبويبة أخرى");
+    location.href = "register.html";
+  }
+});
 </script>
 
 </body>
