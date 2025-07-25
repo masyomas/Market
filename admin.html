@@ -59,12 +59,14 @@ function renderAdmin(){
     <h3>إعداد المدراء</h3>
     <table>
       <tr><th>الاسم</th><th>الهاتف</th><th>الكود</th></tr>`;
-    users.filter(u=>u.role==="admin").forEach((u,i)=>{
-      html+=`<tr>
-        <td>${u.name}</td>
-        <td><input type="text" value="${u.phone}" onchange="editAdmin(${i},'phone',this.value)"></td>
-        <td><input type="number" value="${u.code}" onchange="editAdmin(${i},'code',this.value)"></td>
-      </tr>`;
+    users.forEach((u, idx)=>{
+      if(u.role==="admin"){
+        html+=`<tr>
+          <td>${u.name}</td>
+          <td><input type="text" value="${u.phone}" onchange="editAdminDirect(${idx},'phone',this.value)"></td>
+          <td><input type="number" value="${u.code}" onchange="editAdminDirect(${idx},'code',this.value)"></td>
+        </tr>`;
+      }
     });
     html+=`</table>
     <h3>نسبة البونص الحالية: ${bonus}%</h3>
@@ -123,6 +125,11 @@ function renderAdmin(){
   document.getElementById('adminSection').innerHTML=html;
 }
 
+function editAdminDirect(index,field,value){
+  users[index][field]=field==="code"?parseInt(value):value;
+  localStorage.setItem('users', JSON.stringify(users));
+}
+
 function addProduct(){
   let name=document.getElementById('pName').value.trim();
   let price=parseFloat(document.getElementById('pPrice').value);
@@ -160,13 +167,6 @@ function delProduct(i){
 function editProduct(i,field,value){
   products[i][field]=parseFloat(value)||products[i][field];
   localStorage.setItem('products', JSON.stringify(products));
-}
-
-function editAdmin(i,field,value){
-  let admins=users.filter(u=>u.role==="admin");
-  admins[i][field]=value;
-  users=users.map(u=>u.role==="admin"?admins.shift():u);
-  localStorage.setItem('users', JSON.stringify(users));
 }
 
 function updateBonus(){
