@@ -10,17 +10,17 @@ header { background:#6c757d; color:#fff; padding:12px; font-size:20px; text-alig
 nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px; border-top:1px solid #ddd; border-bottom:1px solid #ddd;}
 nav a { text-decoration:none; color:#333; font-size:14px;}
 nav a:hover { color:#007bff;}
-section { margin:10px auto; width:95%; max-width:900px;}
+section { margin:10px auto; width:95%; max-width:800px;}
 h3 { background:#007bff; color:#fff; padding:6px; border-radius:4px; font-size:17px;}
-input[type=text], input[type=number], select { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
-button { background:#28a745; color:#fff; padding:6px 10px; border:none; border-radius:4px; cursor:pointer; margin:4px 0;}
+input[type=text], input[type=number], input[type=file] { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
+button { background:#28a745; color:#fff; padding:6px 10px; border:none; border-radius:4px; cursor:pointer; margin:4px 2px;}
 button:hover { background:#218838;}
 .logoutBtn { background:#dc3545; }
 .logoutBtn:hover { background:#c82333;}
 table { width:100%; border-collapse:collapse; margin-top:8px;}
 td, th { border:1px solid #ccc; padding:4px; font-size:13px; text-align:center;}
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px;}
-tr:nth-child(even){background:#f9f9f9;}
+tr:nth-child(even) {background:#f9f9f9;}
 </style>
 </head>
 <body>
@@ -28,15 +28,13 @@ tr:nth-child(even){background:#f9f9f9;}
 <header>🛠️ لوحة الإدارة</header>
 
 <nav>
-  <a href="#admins">👥 المدراء</a>
-  <a href="#products">🛍️ إدارة السلع</a>
-  <a href="#sales">📊 المبيعات</a>
-  <a href="#invoice">🧾 الفاتورة</a>
-  <button class="logoutBtn" onclick="logout()">🚪 تسجيل خروج</button>
+  <a href="index.html">🏪 المتجر</a>
+  <a href="myPurchases.html">🛒 مشترياتي</a>
+  <a href="register.html">🔑 حسابي</a>
 </nav>
 
 <section id="adminSection">
-  <!-- سيتم توليد المحتوى تلقائيًا -->
+  <!-- سيتم ملء المحتوى هنا -->
 </section>
 
 <footer>💎 Powered by Almasa 💎</footer>
@@ -49,199 +47,178 @@ let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
 let bonus=parseFloat(localStorage.getItem('bonus')||"1");
 
 function renderAdmin(){
-  if(!logged || (logged.role!=="superadmin" && logged.role!=="admin")){
+  if(!logged || logged.role!=="superadmin"){
     document.getElementById('adminSection').innerHTML='<p>🚫 لا تملك صلاحية الدخول هنا.</p>';
     return;
   }
-  let html=`<h3>مرحبًا ${logged.name}</h3>`;
+  let html="";
+  html+=`<h3>مرحبًا ${logged.name} (سوبر أدمن)</h3>`;
+  html+=`<button class="logoutBtn" onclick="logout()">تسجيل خروج</button>`;
 
-  // المدراء
-  if(logged.role==="superadmin"){
-    html+=`<h3 id="admins">👥 المدراء</h3>
-    <table>
-    <tr><th>الاسم</th><th>الهاتف</th><th>الكود</th><th>تحديث</th></tr>`;
-    users.filter(u=>u.role==="admin").forEach((u,i)=>{
-      html+=`<tr>
-        <td><input value="${u.name}" onchange="editAdmin('${u.code}','name',this.value)"></td>
-        <td><input value="${u.phone}" onchange="editAdmin('${u.code}','phone',this.value)"></td>
-        <td><input value="${u.code}" onchange="editAdmin('${u.code}','code',this.value)"></td>
-        <td><button onclick="deleteAdmin('${u.code}')">🗑️ حذف</button></td>
-      </tr>`;
-    });
-    html+=`</table>
-    <input type="number" id="bonusInput" placeholder="تعديل نسبة البونص (حاليًا ${bonus}%)">
-    <button onclick="updateBonus()">تحديث النسبة</button>`;
-  }
+  // إعداد البونص
+  html+=`<h3>نسبة البونص الحالية: ${bonus}%</h3>
+  <input type="number" id="bonusInput" placeholder="تعديل النسبة">
+  <button onclick="updateBonus()">تحديث النسبة</button>`;
 
-  // إدارة السلع
-  html+=`<h3 id="products">🛍️ إدارة السلع</h3>
-  <input id="pName" placeholder="اسم السلعة">
-  <input type="number" id="pPrice" placeholder="السعر">
-  <input id="pDetails" placeholder="تفاصيل قصيرة">
-  <input id="pImg" placeholder="رابط الصورة">
-  <button onclick="addProduct()">➕ إضافة</button>`;
+  // إضافة سلعة جديدة
+  html+=`
+  <h3>إضافة سلعة جديدة</h3>
+  <input type="text" id="pName" placeholder="اسم السلعة">
+  <input type="number" id="pPrice" placeholder="سعر السلعة">
+  <input type="text" id="pDetails" placeholder="تفاصيل السلعة">
+  <input type="file" id="pImg">
+  <button onclick="addProduct()">إضافة</button>`;
 
+  // عرض السلع
+  html+=`<h3>السلع المضافة</h3>`;
   if(products.length){
     html+=`<table>
     <tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>تفاصيل</th><th>حذف</th></tr>`;
     products.forEach((p,i)=>{
       html+=`<tr>
-        <td><img src="${p.img||'https://via.placeholder.com/50'}" width="50"></td>
-        <td>${p.name}</td>
-        <td>${p.price}</td>
-        <td>${p.details}</td>
-        <td><button onclick="deleteProduct(${i})">🗑️</button></td>
-      </tr>`;
+      <td><img src="${p.img||'https://via.placeholder.com/50'}" width="50"></td>
+      <td>${p.name}</td>
+      <td>${p.price}</td>
+      <td>${p.details}</td>
+      <td><button onclick="delProduct(${i})">🗑️</button></td></tr>`;
     });
     html+=`</table>`;
-  }
+  }else{ html+=`<p>لا توجد سلع بعد.</p>`; }
 
-  // المبيعات
-  html+=`<h3 id="sales">📊 سجل المبيعات</h3>`;
+  // سجل المبيعات
+  html+=`<h3>سجل المبيعات</h3>`;
   if(purchases.length){
     html+=`<table>
-    <tr><th>العميل</th><th>رقم الهاتف</th><th>الكود</th><th>السلعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th><th>تاريخ</th></tr>`;
+    <tr><th>الكود</th><th>العميل</th><th>الهاتف</th><th>السلعة</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th><th>التاريخ</th></tr>`;
     purchases.forEach(p=>{
-      let subtotal=p.qty*p.price;
-      html+=`<tr style="background-color:${colorByCode(p.code)};">
-        <td>${p.name||'غير معروف'}</td>
-        <td>${findPhoneByCode(p.code)||'?'}</td>
+      let u=users.find(u=>u.code==p.code) || {name:"غير معرف",phone:"-"};
+      let total=p.qty * p.price;
+      html+=`<tr>
         <td>${p.code}</td>
+        <td>${u.name}</td>
+        <td>${u.phone}</td>
         <td>${p.product}</td>
         <td>${p.qty}</td>
         <td>${p.price}</td>
-        <td>${subtotal}</td>
+        <td>${total}</td>
         <td>${p.date}</td>
       </tr>`;
     });
     html+=`</table>
-    <button onclick="clearPurchases()">🧹 مسح كل السجل (يتطلب كلمة مرور السوبر أدمن)</button>`;
-  }else{
-    html+=`<p>لا توجد مبيعات بعد.</p>`;
-  }
+    <button onclick="deleteAllPurchases()">🗑️ مسح كل المبيعات</button>`;
+  }else{ html+=`<p>لا توجد مبيعات بعد.</p>`; }
 
-  // الفاتورة
-  html+=`<h3 id="invoice">🧾 الفاتورة</h3>
-  <select id="invoiceSelect"><option disabled selected>اختر كود العميل</option>${
-    users.map(u=>`<option value="${u.code}">${u.name} (${u.code})</option>`).join('')
-  }</select>
-  <button onclick="showInvoice()">📄 عرض الفاتورة</button>
+  // فاتورة
+  html+=`<h3>إصدار فاتورة</h3>
+  <select id="invoiceSelect">
+    <option value="">اختر كود العميل</option>
+    ${users.map(u=>`<option value="${u.code}">${u.name} - ${u.code}</option>`).join('')}
+  </select>
+  <button onclick="showInvoice()">عرض الفاتورة</button>
   <div id="invoiceDetails"></div>`;
 
   document.getElementById('adminSection').innerHTML=html;
 }
 
-// ألوان فريدة حسب الكود
-function colorByCode(code){
-  let hash=0;
-  for(let i=0;i<code.length;i++) hash=code.charCodeAt(i)+((hash<<5)-hash);
-  let color = `hsl(${hash%360},70%,90%)`;
-  return color;
-}
-
-// استدعاء الهاتف من الكود
-function findPhoneByCode(code){
-  let u=users.find(u=>u.code==code);
-  return u?u.phone:null;
-}
-
-// إضافة سلعة
 function addProduct(){
   let name=document.getElementById('pName').value.trim();
   let price=parseFloat(document.getElementById('pPrice').value);
   let details=document.getElementById('pDetails').value.trim();
-  let img=document.getElementById('pImg').value.trim();
-  if(!name||!price||!details){ alert('❗ أكمل البيانات'); return; }
+  let imgInput=document.getElementById('pImg');
+  let img="";
+
+  if(!name||!price||!details){ alert("❗ أكمل جميع البيانات."); return;}
+  if(imgInput.files.length){
+    let reader=new FileReader();
+    reader.onload=function(e){
+      img=e.target.result;
+      saveProduct(name,price,details,img);
+    };
+    reader.readAsDataURL(imgInput.files[0]);
+  }else{
+    saveProduct(name,price,details,"");
+  }
+}
+function saveProduct(name,price,details,img){
   products.push({name,price,details,img});
   localStorage.setItem('products', JSON.stringify(products));
   renderAdmin();
 }
-
-// حذف سلعة
-function deleteProduct(i){
-  if(confirm('⚠️ حذف السلعة؟')){ products.splice(i,1);
+function delProduct(i){
+  if(confirm("⚠️ حذف السلعة؟")){
+    products.splice(i,1);
     localStorage.setItem('products', JSON.stringify(products));
-    renderAdmin(); }
-}
-
-// تحرير مدير
-function editAdmin(oldCode,field,value){
-  let u=users.find(u=>u.code==oldCode);
-  if(u){ u[field]=value; localStorage.setItem('users',JSON.stringify(users)); }
-}
-
-// حذف مدير
-function deleteAdmin(code){
-  if(confirm('⚠️ حذف المدير؟')){
-    users=users.filter(u=>u.code!=code);
-    localStorage.setItem('users', JSON.stringify(users));
     renderAdmin();
   }
 }
-
-// تحديث البونص
 function updateBonus(){
   let b=parseFloat(document.getElementById('bonusInput').value);
-  if(isNaN(b)||b<0){ alert('❗ أدخل نسبة صحيحة'); return;}
-  localStorage.setItem('bonus',b); bonus=b;
+  if(isNaN(b)||b<0){ alert("❗ أدخل نسبة صحيحة."); return;}
+  localStorage.setItem('bonus',b);
+  bonus=b;
   renderAdmin();
 }
-
-// مسح كل المبيعات
-function clearPurchases(){
-  let pwd=prompt('🔒 كلمة مرور السوبر أدمن');
-  if(pwd==='790707071'){ purchases=[]; localStorage.setItem('purchases','[]'); renderAdmin();}
-  else alert('❌ كلمة المرور غير صحيحة');
+function logout(){
+  localStorage.removeItem('loggedUser');
+  location.href='register.html';
 }
 
-// الفاتورة
+// حذف كل المشتريات
+function deleteAllPurchases(){
+  let pass=prompt("💡 أدخل كلمة مرور السوبر أدمن لتأكيد المسح:");
+  if(pass==logged.code){
+    localStorage.removeItem('purchases');
+    purchases=[];
+    alert("✅ تم مسح كل المبيعات.");
+    renderAdmin();
+  }else{
+    alert("❌ كلمة المرور غير صحيحة.");
+  }
+}
+
+// عرض الفاتورة
 function showInvoice(){
   let code=document.getElementById('invoiceSelect').value;
   let u=users.find(u=>u.code==code);
   if(!u) return;
   let userPurchases=purchases.filter(p=>p.code==code);
 
-  // تجميع بنفس اسم المنتج
   let grouped={};
   userPurchases.forEach(p=>{
     if(!grouped[p.product]){
-      grouped[p.product]={ qty:0, price:p.price, dates:[p.date] };
-    }else{
-      grouped[p.product].dates.push(p.date);
+      grouped[p.product]={ qty:0, price:p.price, date:p.date };
     }
     grouped[p.product].qty+=p.qty;
   });
 
-  let html=`<div style="margin-top:10px;">
+  let html=`
+  <div style="margin-top:10px;">
   <div>👤 الاسم: ${u.name}</div>
   <div>📞 الهاتف: ${u.phone}</div>
   <div>🧾 الكود: ${u.code}</div>
+  <div>📅 التاريخ: ${new Date().toLocaleString('ar-EG')}</div>
   <table>
-  <tr><th>السلعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th><th>آخر تاريخ شراء</th></tr>`;
+  <tr><th>السلعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr>`;
   let total=0;
 
-  for(let prod in grouped){
-    let item=grouped[prod];
+  for(let prodName in grouped){
+    let item=grouped[prodName];
     let subtotal=item.qty * item.price;
     total+=subtotal;
-    let lastDate=item.dates[item.dates.length-1];
     html+=`<tr>
-      <td>${prod}</td>
+      <td>${prodName}</td>
       <td>${item.qty}</td>
       <td>${item.price}</td>
       <td>${subtotal}</td>
-      <td>${lastDate}</td>
     </tr>`;
   }
 
-  html+=`<tr><td colspan="4">💰 الإجمالي</td><td>${total}</td></tr></table>
-  <button onclick="window.print()">🖨️ طباعة</button></div>`;
+  html+=`<tr><td colspan="3">💰 الإجمالي</td><td>${total}</td></tr></table>
+  <button onclick="window.print()">🖨️ طباعة الفاتورة</button>
+  </div>`;
 
   document.getElementById('invoiceDetails').innerHTML=html;
 }
-
-// خروج
-function logout(){ localStorage.removeItem('loggedUser'); location.href='register.html'; }
 
 renderAdmin();
 </script>
