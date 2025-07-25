@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🛠️ لوحة الإدارة</title>
 <style>
@@ -10,9 +10,9 @@ header { background:#6c757d; color:#fff; padding:12px; font-size:20px; text-alig
 nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px; border-top:1px solid #ddd; border-bottom:1px solid #ddd;}
 nav a { text-decoration:none; color:#333; font-size:14px;}
 nav a:hover { color:#007bff;}
-section { margin:10px auto; width:95%; max-width:750px;}
+section { margin:10px auto; width:95%; max-width:800px;}
 h3 { background:#007bff; color:#fff; padding:6px; border-radius:4px; font-size:17px;}
-input[type=text], input[type=number], input[type=file], input[type=password] { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
+input[type=text], input[type=number], input[type=file] { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
 button { background:#28a745; color:#fff; padding:6px 10px; border:none; border-radius:4px; cursor:pointer; margin:4px 0;}
 button:hover { background:#218838;}
 .logoutBtn { background:#dc3545; }
@@ -30,12 +30,12 @@ footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; col
 
 <nav>
   <a href="index.html">🏠 المتجر</a>
-  <a href="myPurchases.html">🛒 مشترياتي</a>
+  <a href="salesReport.html">📊 مبيعاتي</a>
   <a href="register.html">🔑 حسابي</a>
 </nav>
 
 <section id="adminSection">
-  <!-- المحتوى يظهر بعد التحقق -->
+  <!-- المحتوى سيظهر بعد التحقق -->
 </section>
 
 <footer>💎 Powered by Almasa 💎</footer>
@@ -46,7 +46,7 @@ let users=JSON.parse(localStorage.getItem('users')||"[]");
 let products=JSON.parse(localStorage.getItem('products')||"[]");
 let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
 let bonus=parseFloat(localStorage.getItem('bonus')||"1");
-let superAdminPass="790707071";  // باسورد السوبر أدمين
+let superAdminPass="790707071"; // كلمة السر الثابتة
 
 function renderAdmin(){
   if(!logged || (logged.role!=="superadmin" && logged.role!=="admin")){
@@ -54,20 +54,22 @@ function renderAdmin(){
     return;
   }
   let html="";
-  html+=`<h3>مرحبًا ${logged.name}</h3>`;
-  html+=`<button class="logoutBtn" onclick="logout()">تسجيل خروج</button>`;
+  html+=`<h3>مرحبًا ${logged.name}</h3>
+  <button class="logoutBtn" onclick="logout()">تسجيل خروج</button>`;
 
   if(logged.role==="superadmin"){
     html+=`
     <h3>إدارة المدراء</h3>
     <table>
       <tr><th>الاسم</th><th>الهاتف</th><th>الكود</th></tr>`;
-    users.filter(u=>u.role==="admin").forEach((u,i)=>{
-      html+=`<tr>
-        <td>${u.name}</td>
-        <td><input type="text" value="${u.phone}" onchange="editAdmin(${i},'phone',this.value)"></td>
-        <td><input type="number" value="${u.code}" onchange="editAdmin(${i},'code',this.value)"></td>
-      </tr>`;
+    users.forEach((u,idx)=>{
+      if(u.role==="admin"){
+        html+=`<tr>
+          <td>${u.name}</td>
+          <td><input type="text" value="${u.phone}" onchange="editAdmin(${idx},'phone',this.value)"></td>
+          <td><input type="number" value="${u.code}" onchange="editAdmin(${idx},'code',this.value)"></td>
+        </tr>`;
+      }
     });
     html+=`</table>
     <h3>نسبة البونص الحالية: ${bonus}%</h3>
@@ -81,46 +83,43 @@ function renderAdmin(){
   <input type="number" id="pPrice" placeholder="سعر السلعة">
   <input type="text" id="pDetails" placeholder="تفاصيل السلعة">
   <input type="file" id="pImg">
-  <button onclick="addProduct()">إضافة</button>
+  <button onclick="addProduct()">إضافة</button>`;
 
-  <h3>السلع المضافة</h3>`;
+  html+=`<h3>السلع المضافة</h3>`;
   if(products.length){
     html+=`<table>
-    <tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>تفاصيل</th><th>تعديل</th><th>حذف</th></tr>`;
+    <tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>تفاصيل</th><th>حذف</th></tr>`;
     products.forEach((p,i)=>{
       html+=`<tr>
-      <td><img src="${p.img||'https://via.placeholder.com/50'}" width="50"></td>
-      <td>${p.name}</td>
-      <td><input type="number" value="${p.price}" onchange="updatePrice(${i},this.value)"></td>
-      <td>${p.details}</td>
-      <td>✅</td>
-      <td><button onclick="delProduct(${i})">🗑️</button></td>
+        <td><img src="${p.img||'https://via.placeholder.com/50'}" width="50"></td>
+        <td>${p.name}</td>
+        <td><input type="number" value="${p.price}" onchange="editProduct(${i},'price',this.value)"></td>
+        <td>${p.details}</td>
+        <td><button onclick="delProduct(${i})">🗑️</button></td>
       </tr>`;
     });
     html+=`</table>`;
-  }else{ html+=`<p>لا توجد سلع بعد.</p>`; }
+  } else { html+=`<p>لا توجد سلع بعد.</p>`; }
 
-  html+=`<h3>سجل المبيعات</h3>`;
+  html+=`<h3>المبيعات</h3>`;
   if(purchases.length){
     html+=`<table>
-    <tr><th>العميل</th><th>الكود</th><th>📞 الهاتف</th><th>السلعة</th><th>الكمية</th><th>السعر</th><th>التاريخ</th><th>الحالة</th></tr>`;
-    purchases.forEach((p,i)=>{
-      let user=users.find(u=>u.code==p.code);
+    <tr><th>العميل</th><th>الهاتف</th><th>الكود</th><th>السلعة</th><th>الكمية</th><th>السعر</th><th>التاريخ</th><th>تم إلغاؤه؟</th></tr>`;
+    purchases.forEach(p=>{
       html+=`<tr>
-      <td>${p.name}</td>
-      <td>${p.code}</td>
-      <td><a href="tel:${user?.phone||''}">${user?.phone||'غير مسجل'}</a></td>
-      <td>${p.product}</td>
-      <td>${p.qty}</td>
-      <td>${p.price}</td>
-      <td>${p.date}</td>
-      <td>${p.canceled?"❌ ملغي":"✅ نشط"}</td>
+        <td>${p.name}</td>
+        <td>${p.phone||''}</td>
+        <td>${p.code}</td>
+        <td>${p.product}</td>
+        <td>${p.qty}</td>
+        <td>${p.price}</td>
+        <td>${p.date}</td>
+        <td>${p.cancelled?'✅':'❌'}</td>
       </tr>`;
     });
     html+=`</table>
-    <br><input type="password" id="restorePass" placeholder="كلمة مرور السوبر أدمين">
-    <button class="restoreBtn" onclick="restorePurchases()">استعادة الجدول الأصلي</button>`;
-  }else{ html+=`<p>لا توجد مبيعات بعد.</p>`; }
+    <button class="restoreBtn" onclick="restorePurchases()">استعادة حالة الجدول</button>`;
+  } else { html+=`<p>لا توجد مبيعات بعد.</p>`; }
 
   document.getElementById('adminSection').innerHTML=html;
 }
@@ -130,43 +129,32 @@ function addProduct(){
   let price=parseFloat(document.getElementById('pPrice').value);
   let details=document.getElementById('pDetails').value.trim();
   let imgInput=document.getElementById('pImg');
-  if(!name||!price||!details){ alert("❗ أكمل جميع البيانات."); return;}
-
-  if(imgInput.files.length){
-    let reader=new FileReader();
-    reader.onload=function(e){
-      products.push({name,price,details,img:e.target.result});
-      localStorage.setItem('products', JSON.stringify(products));
-      renderAdmin();
-    };
-    reader.readAsDataURL(imgInput.files[0]);
-  }else{
-    products.push({name,price,details,img:""});
+  if(!name||!price||!details){ alert("❗ أدخل كل البيانات."); return;}
+  let reader=new FileReader();
+  reader.onload=function(e){
+    products.push({name,price,details,img:e.target.result});
     localStorage.setItem('products', JSON.stringify(products));
     renderAdmin();
-  }
+  };
+  if(imgInput.files.length){ reader.readAsDataURL(imgInput.files[0]); }
+  else { products.push({name,price,details,img:""}); localStorage.setItem('products', JSON.stringify(products)); renderAdmin();}
 }
 
 function delProduct(i){
-  if(confirm("⚠️ حذف السلعة؟")){
+  if(confirm("⚠️ تأكيد حذف السلعة؟")){
     products.splice(i,1);
     localStorage.setItem('products', JSON.stringify(products));
     renderAdmin();
   }
 }
 
-function updatePrice(i,newPrice){
-  if(newPrice>0){
-    products[i].price=parseFloat(newPrice);
-    localStorage.setItem('products', JSON.stringify(products));
-    renderAdmin();
-  }
+function editProduct(i,field,value){
+  products[i][field]=parseFloat(value)||products[i][field];
+  localStorage.setItem('products', JSON.stringify(products));
 }
 
-function editAdmin(i,field,value){
-  let admins=users.filter(u=>u.role==="admin");
-  admins[i][field]=value;
-  users=users.map(u=>u.role==="admin"?admins.shift():u);
+function editAdmin(idx,field,value){
+  users[idx][field]=value;
   localStorage.setItem('users', JSON.stringify(users));
 }
 
@@ -179,25 +167,18 @@ function updateBonus(){
 }
 
 function restorePurchases(){
-  let pass=document.getElementById('restorePass').value;
+  let pass=prompt("أدخل كلمة سر السوبر أدمين:");
   if(pass===superAdminPass){
-    purchases=JSON.parse(localStorage.getItem('originalPurchases')||"[]");
+    purchases.forEach(p=>delete p.cancelled);
     localStorage.setItem('purchases', JSON.stringify(purchases));
-    alert("✅ تمت الاستعادة بنجاح.");
+    alert("✅ تم الاستعادة بنجاح.");
     renderAdmin();
-  }else{
-    alert("❌ كلمة المرور غير صحيحة.");
-  }
+  } else { alert("❌ كلمة سر خاطئة."); }
 }
 
 function logout(){
   localStorage.removeItem('loggedUser');
   location.href='register.html';
-}
-
-// حفظ نسخة أصلية للمبيعات في أول مرة
-if(!localStorage.getItem('originalPurchases')){
-  localStorage.setItem('originalPurchases', JSON.stringify(purchases));
 }
 
 renderAdmin();
