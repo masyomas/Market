@@ -1,114 +1,114 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏪 المتجر</title>
-<style>
-body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff;}
-header { background:#007bff; color:#fff; padding:8px; text-align:center; overflow:hidden; }
-.marquee { display:inline-block; white-space:nowrap; animation:scroll-left 10s linear infinite; font-size:15px;}
-@keyframes scroll-left { 0% {transform:translateX(100%);} 100% {transform:translateX(-100%);} }
-nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px; border-top:1px solid #ddd; border-bottom:1px solid #ddd;}
-nav a { text-decoration:none; color:#333; font-size:14px;}
-nav a:hover { color:#007bff;}
-section { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:10px;}
-.card { border:1px solid #ccc; border-radius:4px; padding:6px; text-align:center;}
-.card img { width:100%; max-height:120px; object-fit:cover; border-radius:4px;}
-button { background:#28a745; color:#fff; padding:4px 8px; border:none; border-radius:4px; cursor:pointer; margin-top:4px;}
-button:hover { background:#218838;}
-select { width:50px; margin:4px; }
-footer { background:#f1f1f1; text-align:center; padding:6px; font-size:12px; color:#777; border-top:1px solid #ddd; margin-top:6px;}
-</style>
-</head>
-<body>
+<!DOCTYPE html>  
+<html lang="ar" dir="rtl">  
+<head>  
+<meta charset="UTF-8" />  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>🏪 المتجر</title>  
+<style>  
+body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff;}  
+header { background:#007bff; color:#fff; padding:8px; text-align:center; overflow:hidden; }  
+.marquee { display:inline-block; white-space:nowrap; animation:scroll-left 10s linear infinite; font-size:15px;}  
+@keyframes scroll-left { 0% {transform:translateX(100%);} 100% {transform:translateX(-100%);} }  
+nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px; border-top:1px solid #ddd; border-bottom:1px solid #ddd;}  
+nav a { text-decoration:none; color:#333; font-size:14px;}  
+nav a:hover { color:#007bff;}  
+section { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:10px;}  
+.card { border:1px solid #ccc; border-radius:4px; padding:6px; text-align:center;}  
+.card img { width:100%; max-height:120px; object-fit:cover; border-radius:4px;}  
+button { background:#28a745; color:#fff; padding:4px 8px; border:none; border-radius:4px; cursor:pointer; margin-top:4px;}  
+button:hover { background:#218838;}  
+select { width:50px; margin:4px; }  
+footer { background:#f1f1f1; text-align:center; padding:6px; font-size:12px; color:#777; border-top:1px solid #ddd; margin-top:6px;}  
+</style>  
+</head>  
+<body>  
 
-<header>
-<span class="marquee" id="userInfo">... جاري التحميل ...</span>
-</header>
+<header>  
+<span class="marquee" id="userInfo">... جاري التحميل ...</span>  
+</header>  
 
-<nav>
-  <a href="https://github.com/masyomas/Market/">🏪 المتجر</a>
-  <a href="myPurchases.html">🛒 مشترياتي</a>
-  <a href="register.html">🔑 حسابي</a>
-</nav>
+<nav>  
+  <a href="index.html">🏪 المتجر</a>  
+  <a href="myPurchases.html">🛒 مشترياتي</a>  
+  <a href="register.html">🔑 حسابي</a>  
+</nav>  
 
-<section id="storeSection">
-  <p>⏳ جاري تحميل السلع...</p>
-</section>
+<section id="storeSection">  
+  <p>⏳ جاري تحميل السلع...</p>  
+</section>  
 
-<footer>💎 Powered by Almasa 💎</footer>
+<footer>💎 Powered by Almasa 💎</footer>  
 
-<script>
-let logged=JSON.parse(localStorage.getItem('loggedUser'));
-let bonus=parseFloat(localStorage.getItem('bonus')||"1");
-let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
+<script>  
+let logged=JSON.parse(localStorage.getItem('loggedUser'));  
+let bonus=parseFloat(localStorage.getItem('bonus')||"1");  
+let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");  
 
-// تحديث الشريط المتحرك
-function updateUserInfo(){
-  if(logged){
-    let userBonus=calcUserBonus();
-    document.getElementById('userInfo').textContent=
-      `👤 ${logged.name} | كود: ${logged.code} | البونص: ${userBonus.toFixed(2)} جنيه`;
-  }else{
-    document.getElementById('userInfo').textContent="⚠️ لم تسجل دخول بعد";
-  }
-}
+function updateUserInfo(){  
+  if(logged){  
+    let userPurchases=purchases.filter(p=>p.phone===logged.phone);  
+    let total=userPurchases.reduce((sum,p)=>sum+(p.price*p.qty),0);  
+    let userBonus=total*(bonus/100);  
+    document.getElementById('userInfo').textContent=  
+      `👤 ${logged.name} | كود: ${logged.code} | البونص: ${userBonus.toFixed(2)} جنيه`;  
+  }else{  
+    document.getElementById('userInfo').textContent="⚠️ لم تسجل دخول بعد";  
+  }  
+}  
 
-// حساب البونص من عمليات الشراء
-function calcUserBonus(){
-  let myPurchases=purchases.filter(p=>p.code===logged?.code);
-  let total=myPurchases.reduce((sum,p)=>sum+(p.price*p.qty),0);
-  return total*(bonus/100);
-}
+async function loadProducts(){  
+  try{  
+    let res=await fetch('products.json');  
+    let products=await res.json();  
+    renderStore(products);  
+  }catch(e){  
+    document.getElementById('storeSection').innerHTML="<p>⚠️ تعذر تحميل السلع.</p>";  
+  }  
+}  
 
-// جلب السلع من ملف JSON
-async function loadProducts(){
-  try{
-    let res=await fetch('products.json');
-    let products=await res.json();
-    renderStore(products);
-  }catch(e){
-    document.getElementById('storeSection').innerHTML="<p>⚠️ تعذر تحميل السلع.</p>";
-  }
-}
+function renderStore(products){  
+  let html="";  
+  products.forEach((p,i)=>{  
+    html+=`  
+    <div class="card">  
+      <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'">  
+      <h4>${p.name}</h4>  
+      <p>السعر: ${p.price} جنيه</p>  
+      <p style="font-size:12px;color:#555;">${p.details}</p>  
+      <label>الكمية:  
+      <select id="qty_${i}">  
+        ${Array.from({length:9},(_,n)=>`<option>${n+1}</option>`).join('')}  
+      </select></label>  
+      <button onclick="buyProduct(${i}, '${p.name}', ${p.price}, '${p.img}')">🛒 شراء</button>  
+    </div>`;  
+  });  
+  document.getElementById('storeSection').innerHTML=html;  
+}  
 
-// عرض السلع
-function renderStore(products){
-  let html="";
-  products.forEach((p,i)=>{
-    html+=`
-    <div class="card">
-      <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'">
-      <h4>${p.name}</h4>
-      <p>السعر: ${p.price} جنيه</p>
-      <p style="font-size:12px;color:#555;">${p.details}</p>
-      <label>الكمية:
-      <select id="qty_${i}">
-        ${Array.from({length:9},(_,n)=>`<option>${n+1}</option>`).join('')}
-      </select></label>
-      <button onclick="buy(${i},${p.price},'${p.name}')">شراء</button>
-    </div>`;
-  });
-  document.getElementById('storeSection').innerHTML=html;
-}
+function buyProduct(i,name,price,img){  
+  if(!logged || logged.role!=="user"){  
+    alert("⚠️ يجب تسجيل الدخول أولاً.");  
+    location.href='register.html';  
+    return;  
+  }  
+  let qty=parseInt(document.getElementById(`qty_${i}`).value);  
+  purchases.push({  
+    phone: logged.phone,  
+    code: logged.code,  
+    name: name,  
+    price: price,  
+    image: img,  
+    qty: qty,  
+    timestamp: Date.now()  
+  });  
+  localStorage.setItem('purchases', JSON.stringify(purchases));  
+  alert("✅ تمت عملية الشراء بنجاح!");  
+  updateUserInfo();  
+}  
 
-// الشراء
-function buy(i,price,name){
-  if(!logged){ alert("⚠️ يجب تسجيل الدخول أولًا."); location.href='register.html'; return;}
-  let qty=parseInt(document.getElementById(`qty_${i}`).value);
-  let date=new Date().toLocaleString('ar');
-  purchases.push({
-    name:logged.name, code:logged.code,
-    product:name, qty, price, date
-  });
-  localStorage.setItem('purchases',JSON.stringify(purchases));
-  alert("✅ تمت عملية الشراء بنجاح!");
-}
+updateUserInfo();  
+loadProducts();  
+</script>  
 
-updateUserInfo();
-loadProducts();
-</script>
-
-</body>
+</body>  
 </html>
