@@ -3,85 +3,109 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🔑 تسجيل الدخول</title>
+<title>📝 التسجيل والدخول</title>
 <style>
 body { font-family:'Tahoma',sans-serif; margin:0; padding:0; text-align:center; background:#fff;}
 header { background:#6c757d; color:#fff; padding:15px; font-size:22px;}
-section { margin:20px auto; width:90%; max-width:400px;}
-input { padding:6px; margin:6px auto; width:80%; max-width:250px;}
-button { padding:6px 12px; margin-top:10px; font-size:14px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;}
+section { margin:10px auto; width:95%; max-width:400px; border-bottom:1px solid #ddd; padding-bottom:10px;}
+h3 { margin-top:10px; }
+input { padding:6px; margin:4px auto; width:80%; max-width:250px;}
+button { padding:6px 12px; margin:6px auto; font-size:14px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;}
 button:hover { background:#555;}
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd;}
 </style>
 </head>
 <body>
 
-<header>🔑 تسجيل الدخول</header>
+<header>📝 التسجيل والدخول</header>
 
 <section>
+  <h3>✨ تسجيل مستخدم جديد</h3>
+  <input type="text" id="newName" placeholder="الاسم الثلاثي"><br/>
+  <input type="text" id="newPhone" placeholder="رقم الموبايل"><br/>
+  <input type="number" id="newCode" placeholder="الكود (2006 - 9998)"><br/>
+  <button onclick="registerNewUser()">✅ تسجيل</button>
+</section>
+
+<section>
+  <h3>🔑 تسجيل الدخول</h3>
   <input type="text" id="phone" placeholder="رقم الموبايل"><br/>
   <input type="number" id="code" placeholder="الكود"><br/>
-  <button onclick="loginUser()">✅ تسجيل الدخول</button>
+  <button onclick="loginUser()">➡️ دخول</button>
 </section>
 
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-// بيانات سوبر أدمين
-let superAdmin = { phone:"01552402913", code:790707071 };
-
-// أكواد المدراء (يتم تحميلها من localStorage أو إعدادها لأول مرة)
+// إعداد البيانات أول مرة
+if(!localStorage.getItem('superAdmin')){
+  localStorage.setItem('superAdmin', JSON.stringify({ phone:"01552402912", code:790707071 }));
+}
 let defaultAdmins = [
-  {name:"admin1", phone:"01111111111", code:9999},
-  {name:"admin2", phone:"01111111112", code:9998},
-  {name:"admin3", phone:"01111111113", code:9997},
-  {name:"admin4", phone:"01111111114", code:9996},
-  {name:"admin5", phone:"01111111115", code:9995}
+  {name:"admin1", phone:"01111111111", code:11111},
+  {name:"admin2", phone:"01111111112", code:22222},
+  {name:"admin3", phone:"01111111113", code:33333},
+  {name:"admin4", phone:"01111111114", code:44444},
+  {name:"admin5", phone:"01111111115", code:55555}
 ];
 if(!localStorage.getItem('admins')){
   localStorage.setItem('admins', JSON.stringify(defaultAdmins));
 }
 
+// تسجيل مستخدم جديد
+function registerNewUser(){
+  let name=document.getElementById('newName').value.trim();
+  let phone=document.getElementById('newPhone').value.trim();
+  let code=parseInt(document.getElementById('newCode').value.trim());
+  let users=JSON.parse(localStorage.getItem('users')||"[]");
+
+  if(!/^[\u0600-\u06FF\s]+$/.test(name) || name.split(' ').length<3){
+    alert("⚠️ أدخل الاسم الثلاثي بحروف عربية فقط"); return;
+  }
+  if(!/^0\d{10}$/.test(phone)){ alert("⚠️ أدخل رقم موبايل صحيح يبدأ بـ0 ويتكون من 11 رقم"); return; }
+  if(isNaN(code)||code<2006||code>9998){ alert("⚠️ الكود خارج النطاق"); return; }
+  if(users.find(u=>u.code===code)){ alert("⚠️ الكود مستخدم"); return; }
+  if(users.find(u=>u.phone===phone)){ alert("⚠️ رقم الموبايل مستخدم"); return; }
+  if(users.find(u=>u.name===name)){ alert("⚠️ الاسم مستخدم"); return; }
+
+  users.push({name, phone, code});
+  localStorage.setItem('users', JSON.stringify(users));
+  alert("✅ تم التسجيل بنجاح! يمكنك الدخول الآن");
+}
+
+// تسجيل الدخول
 function loginUser(){
   let phone=document.getElementById('phone').value.trim();
   let code=parseInt(document.getElementById('code').value.trim());
-  if(!phone || isNaN(code)){ alert("⚠️ أدخل رقم الموبايل والكود"); return; }
+  if(!phone||isNaN(code)){ alert("⚠️ أدخل رقم الموبايل والكود"); return; }
 
+  let superAdmin=JSON.parse(localStorage.getItem('superAdmin'));
   let admins=JSON.parse(localStorage.getItem('admins')||"[]");
+  let users=JSON.parse(localStorage.getItem('users')||"[]");
 
   if(phone===superAdmin.phone && code===superAdmin.code){
-    // تسجيل دخول كسوبر أدمين
-    localStorage.setItem('loggedUser', JSON.stringify({name:"superadmin", code:superAdmin.code, phone:superAdmin.phone}));
+    localStorage.setItem('loggedUser', JSON.stringify({role:"super", phone, code}));
     location.href="admin.html";
   }
   else if(admins.find(a=>a.phone===phone && a.code===code)){
-    // تسجيل دخول كمدير عادي
-    let admin = admins.find(a=>a.phone===phone && a.code===code);
-    localStorage.setItem('loggedUser', JSON.stringify({name:admin.name, code:admin.code, phone:admin.phone}));
+    localStorage.setItem('loggedUser', JSON.stringify({role:"admin", phone, code}));
     location.href="admin.html";
   }
-  else if(code>=2006 && code<=9998){
-    // تسجيل دخول كعميل عادي
-    let users=JSON.parse(localStorage.getItem('users')||"[]");
-    let user=users.find(u=>u.phone===phone && u.code===code);
-    if(user){
-      localStorage.setItem('loggedUser', JSON.stringify({name:user.name, code:user.code, phone:user.phone}));
-      location.href="myPurchases.html";
-    } else {
-      alert("⚠️ لا يوجد مستخدم مسجل بهذه البيانات");
-    }
+  else if(users.find(u=>u.phone===phone && u.code===code)){
+    localStorage.setItem('loggedUser', JSON.stringify({role:"user", phone, code}));
+    location.href="myPurchases.html";
   }
   else{
-    alert("⚠️ بيانات غير صحيحة");
+    alert("⚠️ بيانات غير صحيحة أو مستخدم غير مسجل");
   }
 }
 
-// التقاط تسجيل خروج في تبويبة أخرى
-window.addEventListener('storage',function(e){
-  if(e.key==='loggedUser' && e.newValue===null){
-    alert("👋 تم تسجيل خروجك");
-  }
-});
+// منع ظهور صفحة التسجيل لو الجلسة نشطة
+if(localStorage.getItem('loggedUser')){
+  let u=JSON.parse(localStorage.getItem('loggedUser'));
+  if(u.role==="super"||u.role==="admin") location.href="admin.html";
+  else if(u.role==="user") location.href="myPurchases.html";
+}
 </script>
 
 </body>
