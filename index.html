@@ -1,117 +1,108 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🛍️ المتجر</title>
+<title>🏪 المتجر</title>
 <style>
-body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; text-align:center;}
-header { background:#6c757d; color:#fff; padding:12px; font-size:22px;}
-marquee { background:#007bff; color:#fff; padding:6px; font-size:14px; }
-nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd; border-bottom:1px solid #ddd; }
+body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff;}
+header { background:#007bff; color:#fff; padding:8px; text-align:center; overflow:hidden; }
+.marquee { display:inline-block; white-space:nowrap; animation:scroll-left 10s linear infinite; font-size:15px;}
+@keyframes scroll-left { 0% {transform:translateX(100%);} 100% {transform:translateX(-100%);} }
+nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px; border-top:1px solid #ddd; border-bottom:1px solid #ddd;}
 nav a { text-decoration:none; color:#333; font-size:14px;}
-nav a:hover { color:#007bff; }
-section { margin:10px auto; width:95%; max-width:900px;}
-.products { display:flex; flex-wrap:wrap; justify-content:space-between; }
-.product { border:1px solid #ddd; border-radius:6px; margin:5px; padding:6px; width:48%; box-sizing:border-box;}
-.product img { width:100%; max-height:160px; object-fit:cover; border-radius:4px;}
-.product-details { text-align:right; margin:6px 0; font-size:13px;}
-.buy-section { margin-top:4px; }
-select.qty { padding:2px; font-size:13px; margin-left:3px;}
-button.buyBtn { padding:4px 8px; font-size:13px; background:#28a745; color:#fff; border:none; border-radius:4px; cursor:pointer;}
-button.buyBtn:hover { background:#1e7e34;}
-footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px;}
+nav a:hover { color:#007bff;}
+section { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:10px;}
+.card { border:1px solid #ccc; border-radius:4px; padding:6px; text-align:center;}
+.card img { width:100%; max-height:120px; object-fit:cover; border-radius:4px;}
+button { background:#28a745; color:#fff; padding:4px 8px; border:none; border-radius:4px; cursor:pointer; margin-top:4px;}
+button:hover { background:#218838;}
+select { width:50px; margin:4px; }
+footer { background:#f1f1f1; text-align:center; padding:6px; font-size:12px; color:#777; border-top:1px solid #ddd; margin-top:6px;}
 </style>
 </head>
 <body>
 
-<header>🛍️ المتجر</header>
-
-<marquee id="userInfo" direction="right" scrollamount="6">مرحبًا بك</marquee>
+<header>
+<span class="marquee" id="userInfo">... جاري التحميل ...</span>
+</header>
 
 <nav>
-  <a href="index.html">🏠 المتجر</a>
+  <a href="index.html">🏪 المتجر</a>
   <a href="myPurchases.html">🛒 مشترياتي</a>
   <a href="register.html">🔑 حسابي</a>
 </nav>
 
-<section>
-  <div class="products" id="productsContainer">
-    <!-- سيتم توليد المنتجات هنا -->
-  </div>
+<section id="storeSection">
+  <!-- المنتجات تظهر هنا -->
 </section>
 
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-// بيانات المستخدم
 let logged=JSON.parse(localStorage.getItem('loggedUser'));
-let users=JSON.parse(localStorage.getItem('users')||"[]");
+let bonus=parseFloat(localStorage.getItem('bonus')||"1");
+let products=JSON.parse(localStorage.getItem('products')||"[]");
 let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
-let bonusPercent=parseFloat(localStorage.getItem('bonusPercent'))||1;
 
-let user=users.find(u=>u.phone===logged?.phone && u.code===logged?.code);
-if(user){
-  let userPurchases=purchases.filter(p=>p.phone===user.phone);
-  let total=0; userPurchases.forEach(p=> total+=parseFloat(p.price)||0);
-  let bonus=Math.round((total*bonusPercent)/100);
-  document.getElementById("userInfo").textContent= `👤 ${user.name} | 🧾 الكود: ${user.code} | 🎁 البونص: ${bonus} جنيه`;
-}else{
-  document.getElementById("userInfo").textContent= "⚠️ لم تقم بتسجيل الدخول بعد - قم بالتسجيل للاستفادة من الشراء";
+// تحديث الشريط المتحرك
+function updateUserInfo(){
+  if(logged){
+    let userBonus=calcUserBonus();
+    document.getElementById('userInfo').textContent=
+      `👤 ${logged.name} | كود: ${logged.code} | البونص: ${userBonus.toFixed(2)} جنيه`;
+  }else{
+    document.getElementById('userInfo').textContent="⚠️ لم تسجل دخول بعد";
+  }
 }
 
-// قائمة المنتجات
-let products = [
-  {id:1, name:"سلعة 1", price:100, image:"pictures/product1.jpg", desc:"تفاصيل مختصرة 1"},
-  {id:2, name:"سلعة 2", price:150, image:"pictures/product2.jpg", desc:"تفاصيل مختصرة 2"},
-  {id:3, name:"سلعة 3", price:200, image:"pictures/product3.jpg", desc:"تفاصيل مختصرة 3"},
-  {id:4, name:"سلعة 4", price:250, image:"pictures/product4.jpg", desc:"تفاصيل مختصرة 4"}
-  // يمكن إضافة المزيد
-];
+// حساب البونص من عمليات الشراء
+function calcUserBonus(){
+  let myPurchases=purchases.filter(p=>p.code===logged?.code);
+  let total=myPurchases.reduce((sum,p)=>sum+(p.price*p.qty),0);
+  return total*(bonus/100);
+}
 
-// توليد المنتجات
-let html="";
-products.forEach(prod=>{
-  html+=`
-  <div class="product">
-    <img src="${prod.image}" alt="${prod.name}">
-    <div class="product-details">
-      <div><b>${prod.name}</b></div>
-      <div>السعر: ${prod.price} جنيه</div>
-      <div>${prod.desc}</div>
-    </div>
-    <div class="buy-section">
-      <select class="qty" id="qty_${prod.id}">
-        ${[...Array(9)].map((_,i)=>`<option>${i+1}</option>`).join('')}
-      </select>
-      <button class="buyBtn" onclick="buyProduct('${prod.name}','${prod.price}','${prod.image}','qty_${prod.id}')">شراء</button>
-    </div>
-  </div>`;
-});
-document.getElementById('productsContainer').innerHTML=html;
-
-// دالة الشراء
-function buyProduct(name,price,image,qtySelectId){
-  let logged=JSON.parse(localStorage.getItem('loggedUser'));
-  if(!logged || logged.role!=="user") {
-    alert("⚠️ يجب التسجيل أولاً قبل الشراء.");
-    location.href="register.html";
-    return;
-  }
-  let qty= parseInt(document.getElementById(qtySelectId).value) || 1;
-  let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
-  for(let i=0;i<qty;i++){
-    purchases.push({
-      phone: logged.phone,
-      name: name,
-      price: price,
-      image: image,
-      timestamp: Date.now()+i
+// عرض السلع
+function renderStore(){
+  let html="";
+  if(products.length){
+    products.forEach((p,i)=>{
+      html+=`
+      <div class="card">
+        <img src="${p.img||'https://via.placeholder.com/150'}">
+        <h4>${p.name}</h4>
+        <p>السعر: ${p.price} جنيه</p>
+        <p style="font-size:12px;color:#555;">${p.details}</p>
+        <label>الكمية:
+        <select id="qty_${i}">
+          ${Array.from({length:9},(_,n)=>`<option>${n+1}</option>`).join('')}
+        </select></label>
+        <button onclick="buy(${i})">شراء</button>
+      </div>`;
     });
+  }else{
+    html="<p>⚠️ لا توجد سلع بعد.</p>";
   }
-  localStorage.setItem('purchases', JSON.stringify(purchases));
-  alert(`✅ تم شراء ${qty} قطعة من ${name}`);
+  document.getElementById('storeSection').innerHTML=html;
 }
+
+// الشراء
+function buy(i){
+  if(!logged){ alert("⚠️ يجب تسجيل الدخول أولًا."); location.href='register.html'; return;}
+  let qty=parseInt(document.getElementById(`qty_${i}`).value);
+  let date=new Date().toLocaleString('ar');
+  purchases.push({
+    name:logged.name, code:logged.code,
+    product:products[i].name,
+    qty, price:products[i].price, date
+  });
+  localStorage.setItem('purchases',JSON.stringify(purchases));
+  alert("✅ تمت عملية الشراء بنجاح!");
+}
+
+updateUserInfo();
+renderStore();
 </script>
 
 </body>
