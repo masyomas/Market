@@ -7,6 +7,9 @@
 <style>
 body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; text-align:center;}
 header { background:#6c757d; color:#fff; padding:12px; font-size:22px;}
+nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd; border-bottom:1px solid #ddd; }
+nav a { text-decoration:none; color:#333; font-size:14px;}
+nav a:hover { color:#007bff; }
 section { margin:10px auto; width:95%; max-width:600px;}
 h2 { margin:10px 0; font-size:20px; }
 .info-line { display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px; color:#555;}
@@ -23,6 +26,11 @@ footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; col
 
 <header>🛒 مشترياتي</header>
 
+<nav>
+  <a href="index.html">🛍️ المتجر</a>
+  <a href="register.html">🔑 حسابي</a>
+</nav>
+
 <section>
   <h2 id="userName">اسم العميل</h2>
   <div class="info-line">
@@ -36,13 +44,13 @@ footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; col
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-// تحقق الجلسة
+// التحقق من الجلسة
 let logged=JSON.parse(localStorage.getItem('loggedUser'));
 if(!logged || logged.role!=="user") location.href="register.html";
 
 let users=JSON.parse(localStorage.getItem('users')||"[]");
 let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
-let bonusPercent=parseFloat(localStorage.getItem('bonusPercent')) || 1; // نسبة البونص المخزنة
+let bonusPercent=parseFloat(localStorage.getItem('bonusPercent')) || 1;
 
 let user=users.find(u=>u.phone===logged.phone && u.code===logged.code);
 if(!user){ alert("⚠️ مستخدم غير معرف"); location.href="register.html"; }
