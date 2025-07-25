@@ -1,90 +1,839 @@
 [
-  {"name":"قلم حبر أزرق","price":15,"details":"قلم حبر أزرق عالي الجودة للكتابة اليومية","img":"https://masyomas.github.io/Market/1.jpg"},
-  {"name":"دفتر ملاحظات صغير","price":25,"details":"دفتر ملاحظات بحجم صغير ومريح للحمل","img":"https://masyomas.github.io/Market/2.jpg"},
-  {"name":"حقيبة ظهر متينة","price":150,"details":"حقيبة ظهر بمساحة واسعة وألوان متعددة","img":"https://masyomas.github.io/Market/3.jpg"},
-  {"name":"سماعات أذن لاسلكية","price":250,"details":"سماعات أذن لاسلكية بجودة صوت ممتازة","img":"https://masyomas.github.io/Market/4.jpg"},
-  {"name":"محمصة خبز كهربائية","price":90,"details":"محمصة خبز كهربائية مع تحكم في درجة الحرارة","img":"https://masyomas.github.io/Market/5.jpg"},
-  {"name":"مبرد ماء مكتبي","price":300,"details":"مبرد ماء بارد وساخن للاستخدام المكتبي","img":"https://masyomas.github.io/Market/6.jpg"},
-  {"name":"سوار ذكي لمراقبة النشاط","price":200,"details":"سوار ذكي لتتبع اللياقة والنشاط اليومي","img":"https://masyomas.github.io/Market/7.jpg"},
-  {"name":"مصباح طاولة LED","price":75,"details":"مصباح طاولة مزود بإضاءة LED مع تعديل شدة الضوء","img":"https://masyomas.github.io/Market/8.jpg"},
-  {"name":"كرسي مكتب مريح","price":350,"details":"كرسي مكتب بتصميم مريح قابل للتعديل","img":"https://masyomas.github.io/Market/9.jpg"},
-  {"name":"مروحة تبريد صغيرة","price":60,"details":"مروحة تبريد صغيرة محمولة ومناسبة للمكاتب","img":"https://masyomas.github.io/Market/10.jpg"},
-  {"name":"سماعة رأس للألعاب","price":180,"details":"سماعة رأس مخصصة للألعاب مع ميكروفون عالي الجودة","img":"https://masyomas.github.io/Market/11.jpg"},
-  {"name":"حامل هاتف مكتبي","price":40,"details":"حامل هاتف قابل للتعديل للاستخدام المكتبي","img":"https://masyomas.github.io/Market/12.jpg"},
-  {"name":"لوحة مفاتيح لاسلكية","price":220,"details":"لوحة مفاتيح لاسلكية بتصميم مريح","img":"https://masyomas.github.io/Market/13.jpg"},
-  {"name":"فأرة لاسلكية","price":150,"details":"فأرة لاسلكية عالية الدقة مع بطارية طويلة العمر","img":"https://masyomas.github.io/Market/14.jpg"},
-  {"name":"شاحن سيارة USB","price":45,"details":"شاحن سيارة مزدوج مع منافذ USB","img":"https://masyomas.github.io/Market/15.jpg"},
-  {"name":"حافظة ظهر للهاتف","price":55,"details":"حافظة ظهر حماية للهاتف مع تصميم أنيق","img":"https://masyomas.github.io/Market/16.jpg"},
-  {"name":"ساعة يد أنيقة","price":400,"details":"ساعة يد بتصميم كلاسيكي وعصري","img":"https://masyomas.github.io/Market/17.jpg"},
-  {"name":"مجموعة أدوات مكتبية","price":120,"details":"مجموعة متكاملة من الأدوات المكتبية الأساسية","img":"https://masyomas.github.io/Market/18.jpg"},
-  {"name":"كابل شحن سريع","price":70,"details":"كابل شحن سريع ومتوافق مع معظم الأجهزة","img":"https://masyomas.github.io/Market/19.jpg"},
-  {"name":"سماعة بلوتوث محمولة","price":250,"details":"سماعة بلوتوث صغيرة الحجم بجودة صوت ممتازة","img":"https://masyomas.github.io/Market/20.jpg"},
-  {"name":"حقيبة سفر صغيرة","price":300,"details":"حقيبة سفر خفيفة الوزن ومتينة","img":"https://masyomas.github.io/Market/21.jpg"},
-  {"name":"مجموعة كتب تعليمية","price":180,"details":"مجموعة كتب لتعلم مهارات جديدة","img":"https://masyomas.github.io/Market/22.jpg"},
-  {"name":"كاميرا مراقبة منزلية","price":600,"details":"كاميرا مراقبة عالية الدقة لاسلكية","img":"https://masyomas.github.io/Market/23.jpg"},
-  {"name":"لوحة فنية جدارية","price":250,"details":"لوحة جدارية بطباعة عالية الجودة","img":"https://masyomas.github.io/Market/24.jpg"},
-  {"name":"طابعة صغيرة محمولة","price":550,"details":"طابعة محمولة سهلة الاستخدام","img":"https://masyomas.github.io/Market/25.jpg"},
-  {"name":"حامل لابتوب قابل للطي","price":220,"details":"حامل لابتوب مريح قابل للطي","img":"https://masyomas.github.io/Market/26.jpg"},
-  {"name":"مكبر صوت محمول","price":320,"details":"مكبر صوت بلوتوث محمول بجودة عالية","img":"https://masyomas.github.io/Market/27.jpg"},
-  {"name":"مظلة شمسية صغيرة","price":70,"details":"مظلة صغيرة محمولة للحماية من الشمس","img":"https://masyomas.github.io/Market/28.jpg"},
-  {"name":"قلم لوحي للرسم","price":180,"details":"قلم لوحي للاستخدام مع الأجهزة اللوحية","img":"https://masyomas.github.io/Market/29.jpg"},
-  {"name":"محفظة جلدية","price":130,"details":"محفظة جلدية أنيقة وعملية","img":"https://masyomas.github.io/Market/30.jpg"},
-  {"name":"مقلمة متعددة الاستخدام","price":90,"details":"مقلمة بحجم مناسب وعدة أقلام","img":"https://masyomas.github.io/Market/31.jpg"},
-  {"name":"بطاقة ذاكرة SD","price":150,"details":"بطاقة ذاكرة SD بسعة 64 جيجابايت","img":"https://masyomas.github.io/Market/32.jpg"},
-  {"name":"كاميرا رقمية صغيرة","price":750,"details":"كاميرا رقمية بدقة عالية","img":"https://masyomas.github.io/Market/33.jpg"},
-  {"name":"مروحة مكتب صغيرة","price":80,"details":"مروحة مكتب قابلة للتعديل","img":"https://masyomas.github.io/Market/34.jpg"},
-  {"name":"لوحة مفاتيح ميكانيكية","price":350,"details":"لوحة مفاتيح ميكانيكية للألعاب","img":"https://masyomas.github.io/Market/35.jpg"},
-  {"name":"مكبر صوت للسيارة","price":270,"details":"مكبر صوت عالي الجودة للسيارة","img":"https://masyomas.github.io/Market/36.jpg"},
-  {"name":"شاحن لاسلكي","price":200,"details":"شاحن لاسلكي سريع ومتوافق","img":"https://masyomas.github.io/Market/37.jpg"},
-  {"name":"كاميرا ويب عالية الجودة","price":320,"details":"كاميرا ويب للبث المباشر","img":"https://masyomas.github.io/Market/38.jpg"},
-  {"name":"مقعد ألعاب مريح","price":600,"details":"مقعد ألعاب بتصميم مريح","img":"https://masyomas.github.io/Market/39.jpg"},
-  {"name":"حامل كتب متحرك","price":120,"details":"حامل كتب قابل للتعديل","img":"https://masyomas.github.io/Market/40.jpg"},
-  {"name":"لوحة رسم رقمية","price":480,"details":"لوحة رسم رقمية عالية الدقة","img":"https://masyomas.github.io/Market/41.jpg"},
-  {"name":"ساعة منبه رقمية","price":150,"details":"ساعة منبه بشاشة رقمية","img":"https://masyomas.github.io/Market/42.jpg"},
-  {"name":"حقيبة يد نسائية","price":350,"details":"حقيبة يد أنيقة وعملية","img":"https://masyomas.github.io/Market/43.jpg"},
-  {"name":"شاحن متنقل للهواتف","price":270,"details":"شاحن متنقل بسعة عالية","img":"https://masyomas.github.io/Market/44.jpg"},
-  {"name":"مكبر صوت بلوتوث","price":310,"details":"مكبر صوت لاسلكي بمقاومة للماء","img":"https://masyomas.github.io/Market/45.jpg"},
-  {"name":"لوحة مفاتيح صغيرة","price":120,"details":"لوحة مفاتيح صغيرة لاسلكية","img":"https://masyomas.github.io/Market/46.jpg"},
-  {"name":"سماعات رأس للأذن","price":180,"details":"سماعات رأس مريحة وعالية الجودة","img":"https://masyomas.github.io/Market/47.jpg"},
-  {"name":"مروحة سقف كهربائية","price":430,"details":"مروحة سقف بتصميم عصري","img":"https://masyomas.github.io/Market/48.jpg"},
-  {"name":"حافظة لابتوب مقاومة للماء","price":220,"details":"حافظة لابتوب متينة","img":"https://masyomas.github.io/Market/49.jpg"},
-  {"name":"ساعة يد رياضية","price":400,"details":"ساعة يد بمميزات رياضية","img":"https://masyomas.github.io/Market/50.jpg"},
-  {"name":"مصباح قراءة محمول","price":130,"details":"مصباح قراءة صغير مع بطارية","img":"https://masyomas.github.io/Market/51.jpg"},
-  {"name":"مجموعة أقلام ألوان","price":95,"details":"مجموعة متنوعة من أقلام الألوان","img":"https://masyomas.github.io/Market/52.jpg"},
-  {"name":"مكبر صوت للموبايل","price":280,"details":"مكبر صوت صغير قابل للحمل","img":"https://masyomas.github.io/Market/53.jpg"},
-  {"name":"شاحن USB سريع","price":150,"details":"شاحن USB مع تقنية الشحن السريع","img":"https://masyomas.github.io/Market/54.jpg"},
-  {"name":"قلم رسم فني","price":110,"details":"قلم للرسم والتلوين","img":"https://masyomas.github.io/Market/55.jpg"},
-  {"name":"سماعة رأس لاسلكية","price":350,"details":"سماعة رأس لاسلكية بجودة صوت عالية","img":"https://masyomas.github.io/Market/56.jpg"},
-  {"name":"لوحة مفاتيح إضاءة خلفية","price":390,"details":"لوحة مفاتيح مع إضاءة خلفية","img":"https://masyomas.github.io/Market/57.jpg"},
-  {"name":"كاميرا أكشن صغيرة","price":600,"details":"كاميرا أكشن مقاومة للماء","img":"https://masyomas.github.io/Market/58.jpg"},
-  {"name":"محفظة بطاقات","price":95,"details":"محفظة صغيرة لحفظ البطاقات","img":"https://masyomas.github.io/Market/59.jpg"},
-  {"name":"مكتب مكتبي صغير","price":700,"details":"مكتب مناسب للمساحات الصغيرة","img":"https://masyomas.github.io/Market/60.jpg"},
-  {"name":"ساعة منبه كلاسيكية","price":150,"details":"ساعة منبه بتصميم كلاسيكي","img":"https://masyomas.github.io/Market/61.jpg"},
-  {"name":"حقيبة ظهر مدرسية","price":320,"details":"حقيبة ظهر متينة للمدرسة","img":"https://masyomas.github.io/Market/62.jpg"},
-  {"name":"كاميرا رقمية متقدمة","price":1200,"details":"كاميرا رقمية بدقة عالية جداً","img":"https://masyomas.github.io/Market/63.jpg"},
-  {"name":"مصباح مكتبي مع USB","price":130,"details":"مصباح مكتبي مزود بمنفذ USB","img":"https://masyomas.github.io/Market/64.jpg"},
-  {"name":"لوحة مفاتيح للألعاب","price":400,"details":"لوحة مفاتيح مخصصة للألعاب","img":"https://masyomas.github.io/Market/65.jpg"},
-  {"name":"شاحن متنقل صغير","price":220,"details":"شاحن متنقل بحجم صغير","img":"https://masyomas.github.io/Market/66.jpg"},
-  {"name":"مروحة تبريد للابتوب","price":150,"details":"مروحة تبريد محمولة للابتوب","img":"https://masyomas.github.io/Market/67.jpg"},
-  {"name":"حقيبة يد صغيرة","price":180,"details":"حقيبة يد بتصميم أنيق","img":"https://masyomas.github.io/Market/68.jpg"},
-  {"name":"مجموعة أدوات فنية","price":250,"details":"مجموعة أدوات للرسم والتلوين","img":"https://masyomas.github.io/Market/69.jpg"},
-  {"name":"سماعة بلوتوث صغيرة","price":210,"details":"سماعة بلوتوث محمولة وعالية الجودة","img":"https://masyomas.github.io/Market/70.jpg"},
-  {"name":"لوحة رسم للأطفال","price":100,"details":"لوحة رسم ملونة للأطفال","img":"https://masyomas.github.io/Market/71.jpg"},
-  {"name":"ساعة يد جلدية","price":450,"details":"ساعة يد مع حزام جلدي فاخر","img":"https://masyomas.github.io/Market/72.jpg"},
-  {"name":"حامل هاتف سيار","price":120,"details":"حامل هاتف للسيارة بتركيب آمن","img":"https://masyomas.github.io/Market/73.jpg"},
-  {"name":"مصباح يدوي صغير","price":90,"details":"مصباح يدوي مضغوط وقوي","img":"https://masyomas.github.io/Market/74.jpg"},
-  {"name":"كابل HDMI عالي الجودة","price":180,"details":"كابل HDMI لنقل الفيديو والصوت","img":"https://masyomas.github.io/Market/75.jpg"},
-  {"name":"حافظة تابلت","price":220,"details":"حافظة واقية للتابلت","img":"https://masyomas.github.io/Market/76.jpg"},
-  {"name":"مكبر صوت مكتبي","price":340,"details":"مكبر صوت بمستوى صوت عالي","img":"https://masyomas.github.io/Market/77.jpg"},
-  {"name":"شاحن لاسلكي سريع","price":260,"details":"شاحن لاسلكي يدعم الشحن السريع","img":"https://masyomas.github.io/Market/78.jpg"},
-  {"name":"كاميرا مراقبة خارجية","price":850,"details":"كاميرا مراقبة مقاومة للعوامل الجوية","img":"https://masyomas.github.io/Market/79.jpg"},
-  {"name":"مقلمة أقلام فاخرة","price":150,"details":"مقلمة أنيقة مع أقلام فاخرة","img":"https://masyomas.github.io/Market/80.jpg"},
-  {"name":"مروحة تبريد شخصية","price":70,"details":"مروحة صغيرة محمولة للاستخدام الشخصي","img":"https://masyomas.github.io/Market/81.jpg"},
-  {"name":"ساعة ذكية للرياضة","price":700,"details":"ساعة ذكية بمميزات رياضية متقدمة","img":"https://masyomas.github.io/Market/82.jpg"},
-  {"name":"حافظة هاتف شفافة","price":50,"details":"حافظة شفافة للهاتف","img":"https://masyomas.github.io/Market/83.jpg"},
-  {"name":"مصباح سقف LED","price":190,"details":"مصباح سقف بإضاءة LED موفرة للطاقة","img":"https://masyomas.github.io/Market/84.jpg"},
-  {"name":"مجموعة حقائب سفر","price":950,"details":"مجموعة حقائب سفر متكاملة","img":"https://masyomas.github.io/Market/85.jpg"},
-  {"name":"قلم تابلت ذكي","price":320,"details":"قلم تابلت بدقة عالية","img":"https://masyomas.github.io/Market/86.jpg"},
-  {"name":"مكبر صوت محمول صغير","price":280,"details":"مكبر صوت صغير محمول","img":"https://masyomas.github.io/Market/87.jpg"},
-  {"name":"شاحن محمول بسعة كبيرة","price":450,"details":"شاحن محمول مع سعة بطارية عالية","img":"https://masyomas.github.io/Market/88.jpg"},
-  {"name":"لوحة مفاتيح بتصميم مريح","price":370,"details":"لو
+  {
+    "id": 1,
+    "name": "تفاحة حمراء",
+    "price": 5.5,
+    "details": "تفاحة طازجة ولذيذة من أفضل المزارع",
+    "img": "https://masyomas.github.io/Market/1.jpg"
+  },
+  {
+    "id": 2,
+    "name": "برتقال طازج",
+    "price": 6.0,
+    "details": "برتقال غني بالفيتامين سي وطازج",
+    "img": "https://masyomas.github.io/Market/2.jpg"
+  },
+  {
+    "id": 3,
+    "name": "موز عضوي",
+    "price": 8.0,
+    "details": "موز عضوي عالي الجودة من مزارع طبيعية",
+    "img": "https://masyomas.github.io/Market/3.jpg"
+  },
+  {
+    "id": 4,
+    "name": "عنب أحمر",
+    "price": 7.5,
+    "details": "عنب أحمر حلو الطعم وطازج",
+    "img": "https://masyomas.github.io/Market/4.jpg"
+  },
+  {
+    "id": 5,
+    "name": "كيوي طازج",
+    "price": 10.0,
+    "details": "كيوي غني بالفيتامينات ومذاقه رائع",
+    "img": "https://masyomas.github.io/Market/5.jpg"
+  },
+  {
+    "id": 6,
+    "name": "فراولة حمراء",
+    "price": 12.0,
+    "details": "فراولة حمراء طازجة ومليئة بالنكهة",
+    "img": "https://masyomas.github.io/Market/6.jpg"
+  },
+  {
+    "id": 7,
+    "name": "أناناس طازج",
+    "price": 15.0,
+    "details": "أناناس طازج وحلو من مزارع مختارة",
+    "img": "https://masyomas.github.io/Market/7.jpg"
+  },
+  {
+    "id": 8,
+    "name": "خوخ أصفر",
+    "price": 9.0,
+    "details": "خوخ أصفر طازج وحلو",
+    "img": "https://masyomas.github.io/Market/8.jpg"
+  },
+  {
+    "id": 9,
+    "name": "كمثرى ناضجة",
+    "price": 8.5,
+    "details": "كمثرى ناضجة ولذيذة",
+    "img": "https://masyomas.github.io/Market/9.jpg"
+  },
+  {
+    "id": 10,
+    "name": "ليمون أخضر",
+    "price": 4.5,
+    "details": "ليمون أخضر طازج وعصير",
+    "img": "https://masyomas.github.io/Market/10.jpg"
+  },
+  
+  {
+    "id": 11,
+    "name": "جوافة حمراء",
+    "price": 7.0,
+    "details": "جوافة طازجة ومليئة بالعصير",
+    "img": "https://masyomas.github.io/Market/11.jpg"
+  },
+  {
+    "id": 12,
+    "name": "مشمش طازج",
+    "price": 8.0,
+    "details": "مشمش طبيعي ولذيذ",
+    "img": "https://masyomas.github.io/Market/12.jpg"
+  },
+  {
+    "id": 13,
+    "name": "توت أسود",
+    "price": 13.0,
+    "details": "توت أسود طازج وحلو الطعم",
+    "img": "https://masyomas.github.io/Market/13.jpg"
+  },
+  {
+    "id": 14,
+    "name": "كرز أحمر",
+    "price": 20.0,
+    "details": "كرز أحمر فاخر وطازج",
+    "img": "https://masyomas.github.io/Market/14.jpg"
+  },
+  {
+    "id": 15,
+    "name": "بابايا طازجة",
+    "price": 9.5,
+    "details": "بابايا طازجة ولذيذة",
+    "img": "https://masyomas.github.io/Market/15.jpg"
+  },
+  {
+    "id": 16,
+    "name": "رمان أحمر",
+    "price": 11.0,
+    "details": "رمان غني بالعصير والصحة",
+    "img": "https://masyomas.github.io/Market/16.jpg"
+  },
+  {
+    "id": 17,
+    "name": "مانجو ناضج",
+    "price": 14.0,
+    "details": "مانجو طازج وحلو الطعم",
+    "img": "https://masyomas.github.io/Market/17.jpg"
+  },
+  {
+    "id": 18,
+    "name": "تين طازج",
+    "price": 12.5,
+    "details": "تين طازج من أجود الأنواع",
+    "img": "https://masyomas.github.io/Market/18.jpg"
+  },
+  {
+    "id": 19,
+    "name": "جزر طازج",
+    "price": 5.0,
+    "details": "جزر طازج وصحي",
+    "img": "https://masyomas.github.io/Market/19.jpg"
+  },
+  {
+    "id": 20,
+    "name": "خيار طازج",
+    "price": 4.0,
+    "details": "خيار طازج ومنعش",
+    "img": "https://masyomas.github.io/Market/20.jpg"
+  },
+
+  {
+    "id": 21,
+    "name": "طماطم ناضجة",
+    "price": 5.5,
+    "details": "طماطم ناضجة وطازجة",
+    "img": "https://masyomas.github.io/Market/21.jpg"
+  },
+  {
+    "id": 22,
+    "name": "بطاطس طازجة",
+    "price": 6.0,
+    "details": "بطاطس طازجة وجودة عالية",
+    "img": "https://masyomas.github.io/Market/22.jpg"
+  },
+  {
+    "id": 23,
+    "name": "بصل أبيض",
+    "price": 4.5,
+    "details": "بصل أبيض طازج",
+    "img": "https://masyomas.github.io/Market/23.jpg"
+  },
+  {
+    "id": 24,
+    "name": "ثوم طازج",
+    "price": 7.0,
+    "details": "ثوم طازج وعطري",
+    "img": "https://masyomas.github.io/Market/24.jpg"
+  },
+  {
+    "id": 25,
+    "name": "فلفل أخضر",
+    "price": 5.5,
+    "details": "فلفل أخضر طازج وحار قليلاً",
+    "img": "https://masyomas.github.io/Market/25.jpg"
+  },
+  {
+    "id": 26,
+    "name": "كوسة طازجة",
+    "price": 6.0,
+    "details": "كوسة طازجة وخضراء",
+    "img": "https://masyomas.github.io/Market/26.jpg"
+  },
+  {
+    "id": 27,
+    "name": "باذنجان بنفسجي",
+    "price": 7.5,
+    "details": "باذنجان بنفسجي طازج",
+    "img": "https://masyomas.github.io/Market/27.jpg"
+  },
+  {
+    "id": 28,
+    "name": "فاصوليا خضراء",
+    "price": 8.0,
+    "details": "فاصوليا خضراء طازجة",
+    "img": "https://masyomas.github.io/Market/28.jpg"
+  },
+  {
+    "id": 29,
+    "name": "قرنبيط طازج",
+    "price": 9.0,
+    "details": "قرنبيط طازج ونظيف",
+    "img": "https://masyomas.github.io/Market/29.jpg"
+  },
+  {
+    "id": 30,
+    "name": "ملفوف طازج",
+    "price": 7.0,
+    "details": "ملفوف طازج وصحي",
+    "img": "https://masyomas.github.io/Market/30.jpg"
+  },
+
+  {
+    "id": 31,
+    "name": "حبوب قهوة",
+    "price": 25.0,
+    "details": "حبوب قهوة عربية أصلية",
+    "img": "https://masyomas.github.io/Market/31.jpg"
+  },
+  {
+    "id": 32,
+    "name": "شاي أخضر",
+    "price": 15.0,
+    "details": "شاي أخضر عضوي",
+    "img": "https://masyomas.github.io/Market/32.jpg"
+  },
+  {
+    "id": 33,
+    "name": "سكر أبيض",
+    "price": 6.0,
+    "details": "سكر أبيض نقي",
+    "img": "https://masyomas.github.io/Market/33.jpg"
+  },
+  {
+    "id": 34,
+    "name": "ملح طعام",
+    "price": 3.5,
+    "details": "ملح ناعم عالي الجودة",
+    "img": "https://masyomas.github.io/Market/34.jpg"
+  },
+  {
+    "id": 35,
+    "name": "زيت زيتون",
+    "price": 40.0,
+    "details": "زيت زيتون بكر ممتاز",
+    "img": "https://masyomas.github.io/Market/35.jpg"
+  },
+  {
+    "id": 36,
+    "name": "طحين القمح",
+    "price": 12.0,
+    "details": "طحين قمح نقي",
+    "img": "https://masyomas.github.io/Market/36.jpg"
+  },
+  {
+    "id": 37,
+    "name": "عسل نحل",
+    "price": 35.0,
+    "details": "عسل طبيعي 100%",
+    "img": "https://masyomas.github.io/Market/37.jpg"
+  },
+  {
+    "id": 38,
+    "name": "فول سوداني",
+    "price": 18.0,
+    "details": "فول سوداني محمص",
+    "img": "https://masyomas.github.io/Market/38.jpg"
+  },
+  {
+    "id": 39,
+    "name": "لبن طازج",
+    "price": 8.0,
+    "details": "لبن طازج طبيعي",
+    "img": "https://masyomas.github.io/Market/39.jpg"
+  },
+  {
+    "id": 40,
+    "name": "جبن أبيض",
+    "price": 22.0,
+    "details": "جبن أبيض طازج",
+    "img": "https://masyomas.github.io/Market/40.jpg"
+  },
+
+  {
+    "id": 41,
+    "name": "بيض طازج",
+    "price": 10.0,
+    "details": "بيض طازج من مزارع موثوقة",
+    "img": "https://masyomas.github.io/Market/41.jpg"
+  },
+  {
+    "id": 42,
+    "name": "دجاج طازج",
+    "price": 50.0,
+    "details": "دجاج طازج كامل",
+    "img": "https://masyomas.github.io/Market/42.jpg"
+  },
+  {
+    "id": 43,
+    "name": "لحم بقري",
+    "price": 120.0,
+    "details": "لحم بقري ممتاز",
+    "img": "https://masyomas.github.io/Market/43.jpg"
+  },
+  {
+    "id": 44,
+    "name": "سمك فيليه",
+    "price": 90.0,
+    "details": "سمك فيليه طازج",
+    "img": "https://masyomas.github.io/Market/44.jpg"
+  },
+  {
+    "id": 45,
+    "name": "زبدة طبيعية",
+    "price": 30.0,
+    "details": "زبدة طبيعية طازجة",
+    "img": "https://masyomas.github.io/Market/45.jpg"
+  },
+  {
+    "id": 46,
+    "name": "عصير برتقال",
+    "price": 12.0,
+    "details": "عصير برتقال طبيعي 100%",
+    "img": "https://masyomas.github.io/Market/46.jpg"
+  },
+  {
+    "id": 47,
+    "name": "مياه معدنية",
+    "price": 3.0,
+    "details": "مياه معدنية نقية",
+    "img": "https://masyomas.github.io/Market/47.jpg"
+  },
+  {
+    "id": 48,
+    "name": "شوكولاتة داكنة",
+    "price": 20.0,
+    "details": "شوكولاتة داكنة فاخرة",
+    "img": "https://masyomas.github.io/Market/48.jpg"
+  },
+  {
+    "id": 49,
+    "name": "مربى فراولة",
+    "price": 15.0,
+    "details": "مربى فراولة طبيعية",
+    "img": "https://masyomas.github.io/Market/49.jpg"
+  },
+  {
+    "id": 50,
+    "name": "شوفان صحي",
+    "price": 18.0,
+    "details": "شوفان عضوي صحي",
+    "img": "https://masyomas.github.io/Market/50.jpg"
+  },
+
+  {
+    "id": 51,
+    "name": "شاي أسود",
+    "price": 14.0,
+    "details": "شاي أسود ممتاز",
+    "img": "https://masyomas.github.io/Market/51.jpg"
+  },
+  {
+    "id": 52,
+    "name": "مكرونة إيطالية",
+    "price": 10.0,
+    "details": "مكرونة عالية الجودة",
+    "img": "https://masyomas.github.io/Market/52.jpg"
+  },
+  {
+    "id": 53,
+    "name": "أرز بسمتي",
+    "price": 25.0,
+    "details": "أرز بسمتي فاخر",
+    "img": "https://masyomas.github.io/Market/53.jpg"
+  },
+  {
+    "id": 54,
+    "name": "فاصوليا بيضاء",
+    "price": 12.0,
+    "details": "فاصوليا بيضاء طازجة",
+    "img": "https://masyomas.github.io/Market/54.jpg"
+  },
+  {
+    "id": 55,
+    "name": "عدس أحمر",
+    "price": 11.0,
+    "details": "عدس أحمر مغذي",
+    "img": "https://masyomas.github.io/Market/55.jpg"
+  },
+  {
+    "id": 56,
+    "name": "زيت دوار الشمس",
+    "price": 20.0,
+    "details": "زيت دوار الشمس نقي",
+    "img": "https://masyomas.github.io/Market/56.jpg"
+  },
+  {
+    "id": 57,
+    "name": "خبز بلدي",
+    "price": 4.0,
+    "details": "خبز بلدي طازج",
+    "img": "https://masyomas.github.io/Market/57.jpg"
+  },
+  {
+    "id": 58,
+    "name": "عصير تفاح",
+    "price": 13.0,
+    "details": "عصير تفاح طبيعي 100%",
+    "img": "https://masyomas.github.io/Market/58.jpg"
+  },[
+  {
+    "id": 1,
+    "name": "تفاحة حمراء",
+    "price": 5.5,
+    "details": "تفاحة طازجة ولذيذة من أفضل المزارع",
+    "img": "https://masyomas.github.io/Market/1.jpg"
+  },
+  {
+    "id": 2,
+    "name": "برتقال طازج",
+    "price": 6.0,
+    "details": "برتقال غني بالفيتامين سي وطازج",
+    "img": "https://masyomas.github.io/Market/2.jpg"
+  },
+  {
+    "id": 3,
+    "name": "موز عضوي",
+    "price": 8.0,
+    "details": "موز عضوي عالي الجودة من مزارع طبيعية",
+    "img": "https://masyomas.github.io/Market/3.jpg"
+  },
+  {
+    "id": 4,
+    "name": "عنب أحمر",
+    "price": 7.5,
+    "details": "عنب أحمر حلو الطعم وطازج",
+    "img": "https://masyomas.github.io/Market/4.jpg"
+  },
+  {
+    "id": 5,
+    "name": "كيوي طازج",
+    "price": 10.0,
+    "details": "كيوي غني بالفيتامينات ومذاقه رائع",
+    "img": "https://masyomas.github.io/Market/5.jpg"
+  },
+  {
+    "id": 6,
+    "name": "فراولة حمراء",
+    "price": 12.0,
+    "details": "فراولة حمراء طازجة ومليئة بالنكهة",
+    "img": "https://masyomas.github.io/Market/6.jpg"
+  },
+  {
+    "id": 7,
+    "name": "أناناس طازج",
+    "price": 15.0,
+    "details": "أناناس طازج وحلو من مزارع مختارة",
+    "img": "https://masyomas.github.io/Market/7.jpg"
+  },
+  {
+    "id": 8,
+    "name": "خوخ أصفر",
+    "price": 9.0,
+    "details": "خوخ أصفر طازج وحلو",
+    "img": "https://masyomas.github.io/Market/8.jpg"
+  },
+  {
+    "id": 9,
+    "name": "كمثرى ناضجة",
+    "price": 8.5,
+    "details": "كمثرى ناضجة ولذيذة",
+    "img": "https://masyomas.github.io/Market/9.jpg"
+  },
+  {
+    "id": 10,
+    "name": "ليمون أخضر",
+    "price": 4.5,
+    "details": "ليمون أخضر طازج وعصير",
+    "img": "https://masyomas.github.io/Market/10.jpg"
+  },
+  
+  {
+    "id": 11,
+    "name": "جوافة حمراء",
+    "price": 7.0,
+    "details": "جوافة طازجة ومليئة بالعصير",
+    "img": "https://masyomas.github.io/Market/11.jpg"
+  },
+  {
+    "id": 12,
+    "name": "مشمش طازج",
+    "price": 8.0,
+    "details": "مشمش طبيعي ولذيذ",
+    "img": "https://masyomas.github.io/Market/12.jpg"
+  },
+  {
+    "id": 13,
+    "name": "توت أسود",
+    "price": 13.0,
+    "details": "توت أسود طازج وحلو الطعم",
+    "img": "https://masyomas.github.io/Market/13.jpg"
+  },
+  {
+    "id": 14,
+    "name": "كرز أحمر",
+    "price": 20.0,
+    "details": "كرز أحمر فاخر وطازج",
+    "img": "https://masyomas.github.io/Market/14.jpg"
+  },
+  {
+    "id": 15,
+    "name": "بابايا طازجة",
+    "price": 9.5,
+    "details": "بابايا طازجة ولذيذة",
+    "img": "https://masyomas.github.io/Market/15.jpg"
+  },
+  {
+    "id": 16,
+    "name": "رمان أحمر",
+    "price": 11.0,
+    "details": "رمان غني بالعصير والصحة",
+    "img": "https://masyomas.github.io/Market/16.jpg"
+  },
+  {
+    "id": 17,
+    "name": "مانجو ناضج",
+    "price": 14.0,
+    "details": "مانجو طازج وحلو الطعم",
+    "img": "https://masyomas.github.io/Market/17.jpg"
+  },
+  {
+    "id": 18,
+    "name": "تين طازج",
+    "price": 12.5,
+    "details": "تين طازج من أجود الأنواع",
+    "img": "https://masyomas.github.io/Market/18.jpg"
+  },
+  {
+    "id": 19,
+    "name": "جزر طازج",
+    "price": 5.0,
+    "details": "جزر طازج وصحي",
+    "img": "https://masyomas.github.io/Market/19.jpg"
+  },
+  {
+    "id": 20,
+    "name": "خيار طازج",
+    "price": 4.0,
+    "details": "خيار طازج ومنعش",
+    "img": "https://masyomas.github.io/Market/20.jpg"
+  },
+
+  {
+    "id": 21,
+    "name": "طماطم ناضجة",
+    "price": 5.5,
+    "details": "طماطم ناضجة وطازجة",
+    "img": "https://masyomas.github.io/Market/21.jpg"
+  },
+  {
+    "id": 22,
+    "name": "بطاطس طازجة",
+    "price": 6.0,
+    "details": "بطاطس طازجة وجودة عالية",
+    "img": "https://masyomas.github.io/Market/22.jpg"
+  },
+  {
+    "id": 23,
+    "name": "بصل أبيض",
+    "price": 4.5,
+    "details": "بصل أبيض طازج",
+    "img": "https://masyomas.github.io/Market/23.jpg"
+  },
+  {
+    "id": 24,
+    "name": "ثوم طازج",
+    "price": 7.0,
+    "details": "ثوم طازج وعطري",
+    "img": "https://masyomas.github.io/Market/24.jpg"
+  },
+  {
+    "id": 25,
+    "name": "فلفل أخضر",
+    "price": 5.5,
+    "details": "فلفل أخضر طازج وحار قليلاً",
+    "img": "https://masyomas.github.io/Market/25.jpg"
+  },
+  {
+    "id": 26,
+    "name": "كوسة طازجة",
+    "price": 6.0,
+    "details": "كوسة طازجة وخضراء",
+    "img": "https://masyomas.github.io/Market/26.jpg"
+  },
+  {
+    "id": 27,
+    "name": "باذنجان بنفسجي",
+    "price": 7.5,
+    "details": "باذنجان بنفسجي طازج",
+    "img": "https://masyomas.github.io/Market/27.jpg"
+  },
+  {
+    "id": 28,
+    "name": "فاصوليا خضراء",
+    "price": 8.0,
+    "details": "فاصوليا خضراء طازجة",
+    "img": "https://masyomas.github.io/Market/28.jpg"
+  },
+  {
+    "id": 29,
+    "name": "قرنبيط طازج",
+    "price": 9.0,
+    "details": "قرنبيط طازج ونظيف",
+    "img": "https://masyomas.github.io/Market/29.jpg"
+  },
+  {
+    "id": 30,
+    "name": "ملفوف طازج",
+    "price": 7.0,
+    "details": "ملفوف طازج وصحي",
+    "img": "https://masyomas.github.io/Market/30.jpg"
+  },
+
+  {
+    "id": 31,
+    "name": "حبوب قهوة",
+    "price": 25.0,
+    "details": "حبوب قهوة عربية أصلية",
+    "img": "https://masyomas.github.io/Market/31.jpg"
+  },
+  {
+    "id": 32,
+    "name": "شاي أخضر",
+    "price": 15.0,
+    "details": "شاي أخضر عضوي",
+    "img": "https://masyomas.github.io/Market/32.jpg"
+  },
+  {
+    "id": 33,
+    "name": "سكر أبيض",
+    "price": 6.0,
+    "details": "سكر أبيض نقي",
+    "img": "https://masyomas.github.io/Market/33.jpg"
+  },
+  {
+    "id": 34,
+    "name": "ملح طعام",
+    "price": 3.5,
+    "details": "ملح ناعم عالي الجودة",
+    "img": "https://masyomas.github.io/Market/34.jpg"
+  },
+  {
+    "id": 35,
+    "name": "زيت زيتون",
+    "price": 40.0,
+    "details": "زيت زيتون بكر ممتاز",
+    "img": "https://masyomas.github.io/Market/35.jpg"
+  },
+  {
+    "id": 36,
+    "name": "طحين القمح",
+    "price": 12.0,
+    "details": "طحين قمح نقي",
+    "img": "https://masyomas.github.io/Market/36.jpg"
+  },
+  {
+    "id": 37,
+    "name": "عسل نحل",
+    "price": 35.0,
+    "details": "عسل طبيعي 100%",
+    "img": "https://masyomas.github.io/Market/37.jpg"
+  },
+  {
+    "id": 38,
+    "name": "فول سوداني",
+    "price": 18.0,
+    "details": "فول سوداني محمص",
+    "img": "https://masyomas.github.io/Market/38.jpg"
+  },
+  {
+    "id": 39,
+    "name": "لبن طازج",
+    "price": 8.0,
+    "details": "لبن طازج طبيعي",
+    "img": "https://masyomas.github.io/Market/39.jpg"
+  },
+  {
+    "id": 40,
+    "name": "جبن أبيض",
+    "price": 22.0,
+    "details": "جبن أبيض طازج",
+    "img": "https://masyomas.github.io/Market/40.jpg"
+  },
+
+  {
+    "id": 41,
+    "name": "بيض طازج",
+    "price": 10.0,
+    "details": "بيض طازج من مزارع موثوقة",
+    "img": "https://masyomas.github.io/Market/41.jpg"
+  },
+  {
+    "id": 42,
+    "name": "دجاج طازج",
+    "price": 50.0,
+    "details": "دجاج طازج كامل",
+    "img": "https://masyomas.github.io/Market/42.jpg"
+  },
+  {
+    "id": 43,
+    "name": "لحم بقري",
+    "price": 120.0,
+    "details": "لحم بقري ممتاز",
+    "img": "https://masyomas.github.io/Market/43.jpg"
+  },
+  {
+    "id": 44,
+    "name": "سمك فيليه",
+    "price": 90.0,
+    "details": "سمك فيليه طازج",
+    "img": "https://masyomas.github.io/Market/44.jpg"
+  },
+  {
+    "id": 45,
+    "name": "زبدة طبيعية",
+    "price": 30.0,
+    "details": "زبدة طبيعية طازجة",
+    "img": "https://masyomas.github.io/Market/45.jpg"
+  },
+  {
+    "id": 46,
+    "name": "عصير برتقال",
+    "price": 12.0,
+    "details": "عصير برتقال طبيعي 100%",
+    "img": "https://masyomas.github.io/Market/46.jpg"
+  },
+  {
+    "id": 47,
+    "name": "مياه معدنية",
+    "price": 3.0,
+    "details": "مياه معدنية نقية",
+    "img": "https://masyomas.github.io/Market/47.jpg"
+  },
+  {
+    "id": 48,
+    "name": "شوكولاتة داكنة",
+    "price": 20.0,
+    "details": "شوكولاتة داكنة فاخرة",
+    "img": "https://masyomas.github.io/Market/48.jpg"
+  },
+  {
+    "id": 49,
+    "name": "مربى فراولة",
+    "price": 15.0,
+    "details": "مربى فراولة طبيعية",
+    "img": "https://masyomas.github.io/Market/49.jpg"
+  },
+  {
+    "id": 50,
+    "name": "شوفان صحي",
+    "price": 18.0,
+    "details": "شوفان عضوي صحي",
+    "img": "https://masyomas.github.io/Market/50.jpg"
+  },
+
+  {
+    "id": 51,
+    "name": "شاي أسود",
+    "price": 14.0,
+    "details": "شاي أسود ممتاز",
+    "img": "https://masyomas.github.io/Market/51.jpg"
+  },
+  {
+    "id": 52,
+    "name": "مكرونة إيطالية",
+    "price": 10.0,
+    "details": "مكرونة عالية الجودة",
+    "img": "https://masyomas.github.io/Market/52.jpg"
+  },
+  {
+    "id": 53,
+    "name": "أرز بسمتي",
+    "price": 25.0,
+    "details": "أرز بسمتي فاخر",
+    "img": "https://masyomas.github.io/Market/53.jpg"
+  },
+  {
+    "id": 54,
+    "name": "فاصوليا بيضاء",
+    "price": 12.0,
+    "details": "فاصوليا بيضاء طازجة",
+    "img": "https://masyomas.github.io/Market/54.jpg"
+  },
+  {
+    "id": 55,
+    "name": "عدس أحمر",
+    "price": 11.0,
+    "details": "عدس أحمر مغذي",
+    "img": "https://masyomas.github.io/Market/55.jpg"
+  },
+  {
+    "id": 56,
+    "name": "زيت دوار الشمس",
+    "price": 20.0,
+    "details": "زيت دوار الشمس نقي",
+    "img": "https://masyomas.github.io/Market/56.jpg"
+  },
+  {
+    "id": 57,
+    "name": "خبز بلدي",
+    "price": 4.0,
+    "details": "خبز بلدي طازج",
+    "img": "https://masyomas.github.io/Market/57.jpg"
+  },
+  {
+    "id": 58,
+    "name": "عصير تفاح",
+    "price": 13.0,
+    "details": "عصير تفاح طبيعي 100%",
+    "img": "https://masyomas.github.io/Market/58.jpg"
+  },
+  {
+    "id": 59,
+    "name": "مكسرات مشكلة",
+    "price": 45.0,
+    "details": "مكسرات مشكلة صحية",
+    "img": "https://masyomas.github.io/Market/59.jpg"
+  },
+]
+  {
+    "id": 59,
+    "name": "مكسرات مشكلة",
+    "price": 45.0,
+    "details": "مكسرات مشكلة صحية",
+    "img": "https://masyomas.github.io/Market/59.jpg"
+  },
+]
