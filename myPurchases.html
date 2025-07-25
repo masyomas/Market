@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🛒 مشترياتي</title>
+<style>
+body { font-family:'Tahoma',sans-serif; background:#f9f9f9; margin:0; padding:0; text-align:center; direction:rtl;}
+header { background:#ffc107; color:#000; padding:15px; font-size:22px;}
+nav { background:#ffc107; color:#000; padding:8px; text-align:right;}
+nav a { color:#000; text-decoration:none; margin:0 5px; font-size:15px;}
+nav a:hover { text-decoration:underline;}
+main { margin:20px;}
+section { background:#fff; margin:10px auto; padding:10px; border-radius:8px; width:300px; box-shadow:0 0 5px rgba(0,0,0,0.1);}
+img { width:100%; border-radius:8px; }
+button { margin:3px; padding:4px 8px; font-size:13px; border:none; border-radius:4px; cursor:pointer;}
+.cancelBtn { background:#dc3545; color:#fff;}
+.cancelBtn:hover { background:#a71d2a;}
+.logoutBtn { background:#007bff; color:#fff; margin:10px;}
+.logoutBtn:hover { background:#0056b3;}
+footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd;}
+</style>
+</head>
+<body>
+
+<header>🛒 مشترياتي</header>
+
+<nav>
+  <a href="index.html">🏬 المتجر</a> |
+  <a href="register.html">📝 التسجيل</a> |
+  <a href="myPurchases.html">🛒 مشترياتي</a> |
+  <a href="admin.html">⚙️ الإدارة</a>
+</nav>
+
+<main>
+  <div id="userInfo"></div>
+  <div id="bonusInfo"></div>
+  <button class="logoutBtn" onclick="logout()">🚪 تسجيل خروج</button>
+
+  <h4>🛒 السلع التي قمت بشرائها</h4>
+  <div id="purchasesList"></div>
+</main>
+
+<footer>💎 Powered by Almasa 💎</footer>
+
+<script>
+let users = JSON.parse(localStorage.getItem('users') || "[]");
+let myUser = users[users.length-1]; // نفترض آخر مسجل هو المستخدم الحالي
+
+function showUserInfo(){
+  if(myUser){
+    document.getElementById('userInfo').innerHTML = 
+      `<strong>👤 ${myUser.name}</strong> | 🔑 الكود: ${myUser.code}`;
+  }
+}
+
+function showBonus(){
+  let bonusPercent = parseFloat(localStorage.getItem('bonusPercent')) || 0;
+  let myPurchases = JSON.parse(localStorage.getItem('myPurchases') || "[]");
+  let total = myPurchases.reduce((sum, p)=> sum + parseFloat(p.price), 0);
+  let bonus = total * bonusPercent / 100;
+  document.getElementById('bonusInfo').innerHTML = 
+    `💰 البونص المستحق (${bonusPercent}%): <strong>${bonus.toFixed(2)} جنيه</strong>`;
+}
+
+function showPurchases(){
+  let myPurchases = JSON.parse(localStorage.getItem('myPurchases') || "[]");
+  let now = Date.now();
+  let html = "";
+  myPurchases.forEach((item, index)=>{
+    let canCancel = (now - item.time) <= 6*60*60*1000; // 6 ساعات
+    let date = new Date(item.time).toLocaleString('ar-EG');
+    html += `<section>
+      <img src="${item.img}" alt="${item.name}">
+      <div>🏷️ <strong>${item.name}</strong></div>
+      <div>💰 ${item.price} جنيه</div>
+      <div>📋 ${item.details || ""}</div>
+      <div>🕒 تاريخ الشراء: ${date}</div>
+      ${canCancel ? `<button class="cancelBtn" onclick="cancelPurchase(${index})">🗑️ إلغاء الشراء</button>`:""}
+    </section>`;
+  });
+  document.getElementById('purchasesList').innerHTML = html || "<p>لم تقم بشراء أي سلعة بعد</p>";
+}
+
+function cancelPurchase(index){
+  if(confirm("هل أنت متأكد من إلغاء الشراء؟")){
+    let myPurchases = JSON.parse(localStorage.getItem('myPurchases') || "[]");
+    myPurchases.splice(index,1);
+    localStorage.setItem('myPurchases', JSON.stringify(myPurchases));
+    showPurchases();
+    showBonus();
+  }
+}
+
+function logout(){
+  alert("✅ تم تسجيل الخروج");
+  location.href = "register.html";
+}
+
+// تحميل عند فتح الصفحة
+showUserInfo();
+showBonus();
+showPurchases();
+</script>
+
+</body>
+</html>

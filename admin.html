@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚙️ لوحة الإدارة</title>
+<style>
+body { font-family:'Tahoma',sans-serif; background:#f9f9f9; margin:0; padding:0; text-align:center; direction:rtl;}
+header { background:#007bff; color:#fff; padding:15px; font-size:22px;}
+nav { background:#007bff; color:#fff; padding:8px; text-align:right;}
+nav a { color:#fff; text-decoration:none; margin:0 5px; font-size:15px;}
+nav a:hover { text-decoration:underline;}
+main { margin:30px;}
+.section { background:#fff; margin:15px auto; padding:10px; border-radius:8px; width:300px; box-shadow:0 0 5px rgba(0,0,0,0.1);}
+input, select { padding:8px; margin:5px; font-size:15px; border:1px solid #ccc; border-radius:4px; width:220px;}
+button { margin:5px; padding:6px 12px; font-size:14px; background:#007bff; color:#fff; border:none; border-radius:4px; cursor:pointer;}
+button:hover { background:#0056b3;}
+#adminContent { display:none; }
+footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd;}
+</style>
+</head>
+<body>
+
+<header>⚙️ لوحة الإدارة</header>
+
+<nav>
+  <a href="index.html">🏬 المتجر</a> |
+  <a href="register.html">📝 التسجيل</a> |
+  <a href="myPurchases.html">🛒 مشترياتي</a> |
+  <a href="admin.html">⚙️ الإدارة</a>
+</nav>
+
+<main>
+  <div id="loginForm">
+    <h3>تسجيل دخول المدير</h3>
+    <select id="adminType">
+      <option value="super">سوبر أدمين</option>
+      <option value="admin1">مدير 1</option>
+      <option value="admin2">مدير 2</option>
+      <option value="admin3">مدير 3</option>
+      <option value="admin4">مدير 4</option>
+      <option value="admin5">مدير 5</option>
+    </select><br/>
+    <input type="password" id="adminPass" placeholder="ادخل كلمة المرور"><br/>
+    <button onclick="login()">تسجيل دخول</button>
+  </div>
+
+  <div id="adminContent">
+    <button onclick="logout()">🚪 تسجيل خروج</button>
+
+    <div class="section">
+      <div id="currentEmail">📧 البريد الحالي لتلقي الإشعارات:</div>
+      <button id="changeEmailBtn" onclick="changeTargetEmail()">تغيير البريد</button>
+    </div>
+
+    <div id="bonusSection" class="section">
+      <h4>تحديد نسبة البونص</h4>
+      <input type="number" id="bonusInput" placeholder="مثلاً 5 للخمسة بالمائة">
+      <button onclick="updateBonus()">تحديث النسبة</button>
+    </div>
+
+    <div id="managersSection" class="section">
+      <h4>إدارة المدراء (تغيير كلمة المرور)</h4>
+      <div id="managersList"></div>
+    </div>
+
+    <div id="productsSection" class="section">
+      <h4>إضافة سلعة جديدة</h4>
+      <input type="text" id="productName" placeholder="اسم السلعة">
+      <input type="number" id="productPrice" placeholder="السعر">
+      <input type="text" id="productImage" placeholder="رابط الصورة">
+      <input type="text" id="productDetails" placeholder="تفاصيل السلعة">
+      <button onclick="addProduct()">➕ إضافة السلعة</button>
+
+      <h4>📦 السلع الحالية</h4>
+      <div id="productsList"></div>
+    </div>
+  </div>
+</main>
+
+<footer>💎 Powered by Almasa 💎</footer>
+
+<script>
+// تسجيل الدخول
+function login(){
+  let type = document.getElementById('adminType').value;
+  let pass = document.getElementById('adminPass').value;
+  let correct = false;
+
+  if(type === "super" && pass === "790707071"){
+    localStorage.setItem('isSuperAdmin','true');
+    correct = true;
+  }
+  else if(type.startsWith("admin")){
+    let savedPass = localStorage.getItem(type+"_pass") || "1234";
+    if(pass === savedPass){
+      localStorage.setItem('isAdmin','true');
+      correct = true;
+    }
+  }
+
+  if(correct){
+    document.getElementById('loginForm').style.display = "none";
+    document.getElementById('adminContent').style.display = "block";
+    showContent();
+  } else {
+    alert("❌ كلمة المرور غير صحيحة");
+  }
+}
+
+// تسجيل خروج
+function logout(){
+  localStorage.removeItem('isSuperAdmin');
+  localStorage.removeItem('isAdmin');
+  document.getElementById('adminContent').style.display = "none";
+  document.getElementById('loginForm').style.display = "block";
+}
+
+// عرض محتوى الصفحة بعد تسجيل الدخول
+function showContent(){
+  let email = localStorage.getItem('targetEmail') || "mahmoudadelsaleh@gmail.com";
+  document.getElementById('currentEmail').innerText = "📧 البريد الحالي لتلقي الإشعارات: " + email;
+
+  let isSuper = localStorage.getItem('isSuperAdmin')==="true";
+
+  document.getElementById('changeEmailBtn').style.display = isSuper ? "inline-block":"none";
+  document.getElementById('bonusSection').style.display = isSuper ? "block":"none";
+  document.getElementById('managersSection').style.display = isSuper ? "block":"none";
+
+  if(isSuper){
+    let list = "";
+    for(let i=1; i<=5; i++){
+      let adminId = "admin"+i;
+      let savedPass = localStorage.getItem(adminId+"_pass") || "1234";
+      list += `<div>${adminId}: <input type="text" id="${adminId}_newpass" value="${savedPass}">
+                <button onclick="updateAdminPass('${adminId}')">تحديث</button></div>`;
+    }
+    document.getElementById('managersList').innerHTML = list;
+  }
+
+  showProducts();
+}
+
+// تحديث البريد
+function changeTargetEmail(){
+  let newEmail = prompt("أدخل البريد الجديد لتلقي الإشعارات:");
+  if(newEmail){
+    localStorage.setItem('targetEmail', newEmail);
+    alert('✅ تم تحديث البريد إلى: ' + newEmail);
+    showContent();
+  }
+}
+
+// تحديث نسبة البونص
+function updateBonus(){
+  let bonus = document.getElementById('bonusInput').value;
+  if(bonus){
+    localStorage.setItem('bonusPercent', bonus);
+    alert("✅ تم تحديث نسبة البونص إلى: "+bonus+"%");
+  }
+}
+
+// تحديث كلمة مرور مدير
+function updateAdminPass(adminId){
+  let newPass = document.getElementById(adminId+"_newpass").value;
+  if(newPass){
+    localStorage.setItem(adminId+"_pass", newPass);
+    alert("✅ تم تحديث كلمة المرور لـ "+adminId);
+  }
+}
+
+// إضافة سلعة جديدة
+function addProduct(){
+  let name = document.getElementById('productName').value.trim();
+  let price = parseFloat(document.getElementById('productPrice').value);
+  let img = document.getElementById('productImage').value.trim();
+  let details = document.getElementById('productDetails').value.trim();
+
+  if(!name || !price || !img){
+    alert("❌ يرجى إدخال الاسم والسعر والصورة على الأقل");
+    return;
+  }
+
+  let products = JSON.parse(localStorage.getItem('products') || "[]");
+  products.push({name, price, img, details});
+  localStorage.setItem('products', JSON.stringify(products));
+
+  alert("✅ تم إضافة السلعة بنجاح");
+  document.getElementById('productName').value = "";
+  document.getElementById('productPrice').value = "";
+  document.getElementById('productImage').value = "";
+  document.getElementById('productDetails').value = "";
+
+  showProducts();
+}
+
+// عرض السلع الحالية
+function showProducts(){
+  let products = JSON.parse(localStorage.getItem('products') || "[]");
+  let html = "";
+  products.forEach((item,index)=>{
+    html += `<div style="border-bottom:1px solid #ddd; margin:5px; padding:5px;">
+      🏷️ <strong>${item.name}</strong> - 💰 ${item.price} جنيه<br/>
+      <img src="${item.img}" alt="${item.name}" style="width:100px; margin:5px;"><br/>
+      📋 ${item.details || ""}<br/>
+      <button onclick="deleteProduct(${index})">🗑️ حذف</button>
+    </div>`;
+  });
+  document.getElementById('productsList').innerHTML = html || "لا توجد سلع بعد";
+}
+
+// حذف سلعة
+function deleteProduct(index){
+  if(confirm("هل أنت متأكد من حذف السلعة؟")){
+    let products = JSON.parse(localStorage.getItem('products') || "[]");
+    products.splice(index,1);
+    localStorage.setItem('products', JSON.stringify(products));
+    showProducts();
+  }
+}
+
+// تلقائيًا عند فتح الصفحة: لو المدير مسجل دخول
+if(localStorage.getItem('isSuperAdmin') === "true" || localStorage.getItem('isAdmin') === "true"){
+  document.getElementById('loginForm').style.display = "none";
+  document.getElementById('adminContent').style.display = "block";
+  showContent();
+}
+</script>
+
+</body>
+</html>

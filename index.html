@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏬 المتجر</title>
+<style>
+body { font-family:'Tahoma',sans-serif; background:#f9f9f9; margin:0; padding:0; text-align:center; direction:rtl;}
+header { background:#28a745; color:#fff; padding:15px; font-size:22px;}
+nav { background:#28a745; color:#fff; padding:8px; text-align:right;}
+nav a { color:#fff; text-decoration:none; margin:0 5px; font-size:15px;}
+nav a:hover { text-decoration:underline;}
+main { margin:20px; display:flex; flex-wrap:wrap; justify-content:center;}
+.product { background:#fff; margin:10px; padding:10px; border-radius:8px; width:150px; box-shadow:0 0 5px rgba(0,0,0,0.1);}
+.product img { width:100%; height:auto; border-radius:8px; }
+.product button { margin:3px; padding:4px 8px; font-size:13px; border:none; border-radius:4px; cursor:pointer;}
+.buyBtn { background:#007bff; color:#fff;}
+.buyBtn:hover { background:#0056b3;}
+.likeBtn { background:#dc3545; color:#fff;}
+.likeBtn:hover { background:#a71d2a;}
+footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd;}
+</style>
+</head>
+<body>
+
+<header>🏬 المتجر</header>
+
+<nav>
+  <a href="index.html">🏬 المتجر</a> |
+  <a href="register.html">📝 التسجيل</a> |
+  <a href="myPurchases.html">🛒 مشترياتي</a> |
+  <a href="admin.html">⚙️ الإدارة</a>
+</nav>
+
+<main id="productsList">
+  <!-- المنتجات ستظهر هنا -->
+</main>
+
+<footer>💎 Powered by Almasa 💎</footer>
+
+<script>
+// جلب المنتجات من localStorage
+function loadProducts(){
+  let products = JSON.parse(localStorage.getItem('products') || "[]");
+  let html = "";
+  products.forEach((item,index)=>{
+    html += `<div class="product">
+      <img src="${item.img}" alt="${item.name}">
+      <div><strong>🏷️ ${item.name}</strong></div>
+      <div>💰 ${item.price} جنيه</div>
+      <div>📋 ${item.details || ""}</div>
+      <button class="likeBtn" onclick="likeProduct(${index})">❤️ إعجاب</button>
+      <button class="buyBtn" onclick="buyProduct(${index})">🛒 شراء</button>
+    </div>`;
+  });
+  document.getElementById('productsList').innerHTML = html || "<p>لا توجد منتجات متاحة</p>";
+}
+
+// إعجاب بالمنتج
+function likeProduct(index){
+  alert("❤️ تم إضافة المنتج للمفضلة (تجريبي)");
+}
+
+// شراء المنتج + إرسال إيميل
+function buyProduct(index){
+  let products = JSON.parse(localStorage.getItem('products') || "[]");
+  let product = products[index];
+  let myPurchases = JSON.parse(localStorage.getItem('myPurchases') || "[]");
+  myPurchases.push({ name: product.name, price: product.price, img: product.img, details: product.details, time: Date.now() });
+  localStorage.setItem('myPurchases', JSON.stringify(myPurchases));
+  alert("✅ تم شراء المنتج بنجاح!");
+
+  // إرسال إيميل (بشكل تجريبي نطبع في الكونسول)
+  let email = localStorage.getItem('targetEmail') || "mahmoudadelsaleh@gmail.com";
+  console.log("📧 إرسال إيميل إلى: "+email);
+  console.log("المنتج: "+product.name+" | السعر: "+product.price);
+  // هنا المفروض تستخدم EmailJS أو غيره لتنفيذ الإرسال الحقيقي
+}
+
+// تحميل عند فتح الصفحة
+loadProducts();
+</script>
+
+</body>
+</html>
