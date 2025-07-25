@@ -1,158 +1,250 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🛠️ لوحة الإدارة</title>
 <style>
-body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; }
-header { background:#6c757d; color:#fff; padding:12px; font-size:20px; text-align:center; }
-nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px; border-top:1px solid #ddd; border-bottom:1px solid #ddd; }
-nav a { text-decoration:none; color:#333; font-size:14px; }
-nav a:hover { color:#007bff; }
-section { margin:10px auto; width:95%; max-width:900px; }
-h3 { background:#007bff; color:#fff; padding:6px; border-radius:4px; font-size:17px; }
-input[type=text], input[type=number], input[type=file] { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px; }
-button { background:#28a745; color:#fff; padding:6px 10px; border:none; border-radius:4px; cursor:pointer; margin:4px 2px; }
-button:hover { background:#218838; }
+body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff;}
+header { background:#6c757d; color:#fff; padding:12px; font-size:20px; text-align:center;}
+nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px; border-top:1px solid #ddd; border-bottom:1px solid #ddd;}
+nav a { text-decoration:none; color:#333; font-size:14px;}
+nav a:hover { color:#007bff;}
+section { margin:10px auto; width:95%; max-width:900px;}
+h3 { background:#007bff; color:#fff; padding:6px; border-radius:4px; font-size:17px;}
+input[type=text], input[type=number], select { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
+button { background:#28a745; color:#fff; padding:6px 10px; border:none; border-radius:4px; cursor:pointer; margin:4px 0;}
+button:hover { background:#218838;}
 .logoutBtn { background:#dc3545; }
-.logoutBtn:hover { background:#c82333; }
-table { width:100%; border-collapse:collapse; margin-top:8px; }
-th, td { border:1px solid #ccc; padding:4px; font-size:13px; text-align:center; }
-th { cursor:pointer; background:#f1f1f1; }
-tr:nth-child(even) { background:#fafafa; }
-.color-0{background:#e0f7fa;} .color-1{background:#f1f8e9;} .color-2{background:#fff3e0;} .color-3{background:#fce4ec;} .color-4{background:#ede7f6;}
-footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px; }
+.logoutBtn:hover { background:#c82333;}
+table { width:100%; border-collapse:collapse; margin-top:8px;}
+td, th { border:1px solid #ccc; padding:4px; font-size:13px; text-align:center;}
+footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px;}
+tr:nth-child(even){background:#f9f9f9;}
 </style>
 </head>
-<body><header>🛠️ لوحة الإدارة</header><nav>
-  <a href="#" onclick="showTab('products')">📦 السلع</a>
-  <a href="#" onclick="showTab('sales')">📊 سجل المبيعات</a>
-  <a href="#" onclick="showTab('invoice')">🧾 الفاتورة</a>
-  <a href="#" onclick="showTab('admins')">👥 المدراء</a>
+<body>
+
+<header>🛠️ لوحة الإدارة</header>
+
+<nav>
+  <a href="#admins">👥 المدراء</a>
+  <a href="#products">🛍️ إدارة السلع</a>
+  <a href="#sales">📊 المبيعات</a>
+  <a href="#invoice">🧾 الفاتورة</a>
   <button class="logoutBtn" onclick="logout()">🚪 تسجيل خروج</button>
-</nav><section id="adminContent"></section><footer>💎 Powered by Almasa 💎</footer><script>
+</nav>
+
+<section id="adminSection">
+  <!-- سيتم توليد المحتوى تلقائيًا -->
+</section>
+
+<footer>💎 Powered by Almasa 💎</footer>
+
+<script>
+let logged=JSON.parse(localStorage.getItem('loggedUser'));
 let users=JSON.parse(localStorage.getItem('users')||"[]");
 let products=JSON.parse(localStorage.getItem('products')||"[]");
 let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
-let logged=JSON.parse(localStorage.getItem('loggedUser'));
 let bonus=parseFloat(localStorage.getItem('bonus')||"1");
 
-if(!logged || (logged.role!=="superadmin" && logged.role!=="admin")){
-  document.getElementById('adminContent').innerHTML='<p>🚫 لا تملك صلاحية الدخول.</p>';
-}else{
-  showTab('products');
-}
+function renderAdmin(){
+  if(!logged || (logged.role!=="superadmin" && logged.role!=="admin")){
+    document.getElementById('adminSection').innerHTML='<p>🚫 لا تملك صلاحية الدخول هنا.</p>';
+    return;
+  }
+  let html=`<h3>مرحبًا ${logged.name}</h3>`;
 
-function showTab(tab){
-  if(tab=="products"){ renderProducts(); }
-  else if(tab=="sales"){ renderSales(); }
-  else if(tab=="invoice"){ renderInvoiceTab(); }
-  else if(tab=="admins" && logged.role=="superadmin"){ renderAdmins(); }
-  else{ document.getElementById('adminContent').innerHTML='<p>🚫 لا تملك صلاحية الوصول.</p>'; }
-}
+  // المدراء
+  if(logged.role==="superadmin"){
+    html+=`<h3 id="admins">👥 المدراء</h3>
+    <table>
+    <tr><th>الاسم</th><th>الهاتف</th><th>الكود</th><th>تحديث</th></tr>`;
+    users.filter(u=>u.role==="admin").forEach((u,i)=>{
+      html+=`<tr>
+        <td><input value="${u.name}" onchange="editAdmin('${u.code}','name',this.value)"></td>
+        <td><input value="${u.phone}" onchange="editAdmin('${u.code}','phone',this.value)"></td>
+        <td><input value="${u.code}" onchange="editAdmin('${u.code}','code',this.value)"></td>
+        <td><button onclick="deleteAdmin('${u.code}')">🗑️ حذف</button></td>
+      </tr>`;
+    });
+    html+=`</table>
+    <input type="number" id="bonusInput" placeholder="تعديل نسبة البونص (حاليًا ${bonus}%)">
+    <button onclick="updateBonus()">تحديث النسبة</button>`;
+  }
 
-function renderProducts(){
-  let html=`<h3>إضافة سلعة</h3>
-  <input type="text" id="pName" placeholder="اسم السلعة">
-  <input type="number" id="pPrice" placeholder="سعر السلعة">
-  <input type="text" id="pDetails" placeholder="تفاصيل">
-  <input type="file" id="pImg">
-  <button onclick="addProduct()">➕ إضافة</button>
-  <h3>السلع الحالية</h3>`;
+  // إدارة السلع
+  html+=`<h3 id="products">🛍️ إدارة السلع</h3>
+  <input id="pName" placeholder="اسم السلعة">
+  <input type="number" id="pPrice" placeholder="السعر">
+  <input id="pDetails" placeholder="تفاصيل قصيرة">
+  <input id="pImg" placeholder="رابط الصورة">
+  <button onclick="addProduct()">➕ إضافة</button>`;
+
   if(products.length){
-    html+=`<table><tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>تفاصيل</th><th>تعديل</th><th>حذف</th></tr>`;
+    html+=`<table>
+    <tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>تفاصيل</th><th>حذف</th></tr>`;
     products.forEach((p,i)=>{
       html+=`<tr>
         <td><img src="${p.img||'https://via.placeholder.com/50'}" width="50"></td>
         <td>${p.name}</td>
-        <td><input type='number' value='${p.price}' onchange='editProduct(${i},"price",this.value)'></td>
+        <td>${p.price}</td>
         <td>${p.details}</td>
-        <td><button onclick='editProduct(${i})'>✏️</button></td>
-        <td><button onclick='delProduct(${i})'>🗑️</button></td></tr>`;
+        <td><button onclick="deleteProduct(${i})">🗑️</button></td>
+      </tr>`;
     });
-    html+='</table>';
-  }else{ html+='<p>لا توجد سلع.</p>'; }
-  document.getElementById('adminContent').innerHTML=html;
+    html+=`</table>`;
+  }
+
+  // المبيعات
+  html+=`<h3 id="sales">📊 سجل المبيعات</h3>`;
+  if(purchases.length){
+    html+=`<table>
+    <tr><th>العميل</th><th>رقم الهاتف</th><th>الكود</th><th>السلعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th><th>تاريخ</th></tr>`;
+    purchases.forEach(p=>{
+      let subtotal=p.qty*p.price;
+      html+=`<tr style="background-color:${colorByCode(p.code)};">
+        <td>${p.name||'غير معروف'}</td>
+        <td>${findPhoneByCode(p.code)||'?'}</td>
+        <td>${p.code}</td>
+        <td>${p.product}</td>
+        <td>${p.qty}</td>
+        <td>${p.price}</td>
+        <td>${subtotal}</td>
+        <td>${p.date}</td>
+      </tr>`;
+    });
+    html+=`</table>
+    <button onclick="clearPurchases()">🧹 مسح كل السجل (يتطلب كلمة مرور السوبر أدمن)</button>`;
+  }else{
+    html+=`<p>لا توجد مبيعات بعد.</p>`;
+  }
+
+  // الفاتورة
+  html+=`<h3 id="invoice">🧾 الفاتورة</h3>
+  <select id="invoiceSelect"><option disabled selected>اختر كود العميل</option>${
+    users.map(u=>`<option value="${u.code}">${u.name} (${u.code})</option>`).join('')
+  }</select>
+  <button onclick="showInvoice()">📄 عرض الفاتورة</button>
+  <div id="invoiceDetails"></div>`;
+
+  document.getElementById('adminSection').innerHTML=html;
 }
 
+// ألوان فريدة حسب الكود
+function colorByCode(code){
+  let hash=0;
+  for(let i=0;i<code.length;i++) hash=code.charCodeAt(i)+((hash<<5)-hash);
+  let color = `hsl(${hash%360},70%,90%)`;
+  return color;
+}
+
+// استدعاء الهاتف من الكود
+function findPhoneByCode(code){
+  let u=users.find(u=>u.code==code);
+  return u?u.phone:null;
+}
+
+// إضافة سلعة
 function addProduct(){
   let name=document.getElementById('pName').value.trim();
   let price=parseFloat(document.getElementById('pPrice').value);
   let details=document.getElementById('pDetails').value.trim();
-  let imgInput=document.getElementById('pImg');
-  let img="";
-  if(!name||!price||!details){ alert("❗ أكمل كل البيانات"); return; }
-  if(imgInput.files.length){
-    let reader=new FileReader();
-    reader.onload=e=>{ products.push({name,price,details,img:e.target.result}); saveProducts(); };
-    reader.readAsDataURL(imgInput.files[0]);
-  }else{ products.push({name,price,details,img}); saveProducts(); }
-}
-function saveProducts(){ localStorage.setItem('products',JSON.stringify(products)); renderProducts(); }
-function editProduct(i,field,val){ if(field){ products[i][field]=val; saveProducts(); } }
-function delProduct(i){ if(confirm("⚠️ حذف السلعة؟")){ products.splice(i,1); saveProducts(); } }
-
-function renderSales(){
-  let html='<h3>📊 سجل المبيعات</h3>';
-  if(purchases.length){
-    html+='<table><tr><th onclick="sortSales(\'name\')">العميل</th><th>الكود</th><th>الهاتف</th><th>السلعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th><th>التاريخ</th></tr>';
-    purchases.forEach((p,i)=>{
-      let u=users.find(u=>u.code==p.code) ||{};
-      let subtotal=p.qty*p.price;
-      let colorIndex=p.code%5;
-      html+=`<tr class='color-${colorIndex}'><td>${u.name||'غير معروف'}</td><td>${p.code}</td><td>${u.phone||''}</td><td>${p.product}</td><td>${p.qty}</td><td>${p.price}</td><td>${subtotal}</td><td>${p.date}</td></tr>`;
-    });
-    html+='</table>';
-    html+='<button onclick="clearSales()">🗑️ مسح كل المبيعات</button>';
-  }else{ html+='<p>لا توجد مبيعات بعد.</p>'; }
-  document.getElementById('adminContent').innerHTML=html;
-}
-function clearSales(){
-  let pass=prompt("🔑 أدخل كلمة مرور السوبر أدمن");
-  if(pass=="790707071"){ purchases=[]; localStorage.setItem('purchases','[]'); renderSales(); }
-  else{ alert("❌ كلمة مرور خاطئة"); }
+  let img=document.getElementById('pImg').value.trim();
+  if(!name||!price||!details){ alert('❗ أكمل البيانات'); return; }
+  products.push({name,price,details,img});
+  localStorage.setItem('products', JSON.stringify(products));
+  renderAdmin();
 }
 
-function renderInvoiceTab(){
-  let html='<h3>🧾 الفاتورة</h3><select onchange="showInvoice(this.value)"><option>اختر كود العميل</option>';
-  users.forEach(u=>{ html+=`<option value='${u.code}'>${u.name} (${u.code})</option>`; });
-  html+='</select><div id="invoiceDetails"></div>';
-  document.getElementById('adminContent').innerHTML=html;
+// حذف سلعة
+function deleteProduct(i){
+  if(confirm('⚠️ حذف السلعة؟')){ products.splice(i,1);
+    localStorage.setItem('products', JSON.stringify(products));
+    renderAdmin(); }
 }
-function showInvoice(code){
+
+// تحرير مدير
+function editAdmin(oldCode,field,value){
+  let u=users.find(u=>u.code==oldCode);
+  if(u){ u[field]=value; localStorage.setItem('users',JSON.stringify(users)); }
+}
+
+// حذف مدير
+function deleteAdmin(code){
+  if(confirm('⚠️ حذف المدير؟')){
+    users=users.filter(u=>u.code!=code);
+    localStorage.setItem('users', JSON.stringify(users));
+    renderAdmin();
+  }
+}
+
+// تحديث البونص
+function updateBonus(){
+  let b=parseFloat(document.getElementById('bonusInput').value);
+  if(isNaN(b)||b<0){ alert('❗ أدخل نسبة صحيحة'); return;}
+  localStorage.setItem('bonus',b); bonus=b;
+  renderAdmin();
+}
+
+// مسح كل المبيعات
+function clearPurchases(){
+  let pwd=prompt('🔒 كلمة مرور السوبر أدمن');
+  if(pwd==='790707071'){ purchases=[]; localStorage.setItem('purchases','[]'); renderAdmin();}
+  else alert('❌ كلمة المرور غير صحيحة');
+}
+
+// الفاتورة
+function showInvoice(){
+  let code=document.getElementById('invoiceSelect').value;
   let u=users.find(u=>u.code==code);
   if(!u) return;
   let userPurchases=purchases.filter(p=>p.code==code);
-  let html=`<div><div>👤 الاسم: ${u.name}</div><div>📞 الهاتف: ${u.phone}</div><div>🧾 الكود: ${u.code}</div><div>📅 التاريخ: ${new Date().toLocaleString('ar-EG')}</div>
-  <table><tr><th>السلعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr>`;
-  let total=0;
+
+  // تجميع بنفس اسم المنتج
+  let grouped={};
   userPurchases.forEach(p=>{
-    let subtotal=p.qty*p.price;
-    total+=subtotal;
-    html+=`<tr><td>${p.product}</td><td>${p.qty}</td><td>${p.price}</td><td>${subtotal}</td></tr>`;
+    if(!grouped[p.product]){
+      grouped[p.product]={ qty:0, price:p.price, dates:[p.date] };
+    }else{
+      grouped[p.product].dates.push(p.date);
+    }
+    grouped[p.product].qty+=p.qty;
   });
-  html+=`<tr><td colspan='3'>💰 الإجمالي</td><td>${total}</td></tr></table>
-  <button onclick="window.print()">🖨️ طباعة الفاتورة</button></div>`;
+
+  let html=`<div style="margin-top:10px;">
+  <div>👤 الاسم: ${u.name}</div>
+  <div>📞 الهاتف: ${u.phone}</div>
+  <div>🧾 الكود: ${u.code}</div>
+  <table>
+  <tr><th>السلعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th><th>آخر تاريخ شراء</th></tr>`;
+  let total=0;
+
+  for(let prod in grouped){
+    let item=grouped[prod];
+    let subtotal=item.qty * item.price;
+    total+=subtotal;
+    let lastDate=item.dates[item.dates.length-1];
+    html+=`<tr>
+      <td>${prod}</td>
+      <td>${item.qty}</td>
+      <td>${item.price}</td>
+      <td>${subtotal}</td>
+      <td>${lastDate}</td>
+    </tr>`;
+  }
+
+  html+=`<tr><td colspan="4">💰 الإجمالي</td><td>${total}</td></tr></table>
+  <button onclick="window.print()">🖨️ طباعة</button></div>`;
+
   document.getElementById('invoiceDetails').innerHTML=html;
 }
 
-function renderAdmins(){
-  let html='<h3>👥 المدراء</h3><table><tr><th>الاسم</th><th>الهاتف</th><th>الكود</th></tr>';
-  users.filter(u=>u.role==='admin').forEach((u,i)=>{
-    html+=`<tr><td><input value='${u.name}' onchange='editAdmin(${i},"name",this.value)'></td>
-    <td><input value='${u.phone}' onchange='editAdmin(${i},"phone",this.value)'></td>
-    <td><input value='${u.code}' onchange='editAdmin(${i},"code",this.value)'></td></tr>`;
-  });
-  html+='</table>';
-  document.getElementById('adminContent').innerHTML=html;
-}
-function editAdmin(i,field,val){
-  let admins=users.filter(u=>u.role==='admin');
-  admins[i][field]=val;
-  users=users.map(u=>u.role==='admin'?admins.shift():u);
-  localStorage.setItem('users', JSON.stringify(users));
-}
-
+// خروج
 function logout(){ localStorage.removeItem('loggedUser'); location.href='register.html'; }
-</script></body>
+
+renderAdmin();
+</script>
+
+</body>
 </html>
