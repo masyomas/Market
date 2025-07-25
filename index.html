@@ -5,80 +5,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🏬 المتجر</title>
 <style>
-body { font-family:'Tahoma',sans-serif; background:#f9f9f9; margin:0; padding:0; text-align:center; direction:rtl;}
-header { background:#28a745; color:#fff; padding:15px; font-size:22px;}
-nav { background:#28a745; color:#fff; padding:8px; text-align:right;}
+body { font-family:'Tahoma',sans-serif; background:#fff; margin:0; padding:0; text-align:center; direction:rtl;}
+header { background:#6c757d; color:#fff; padding:15px; font-size:22px;}
+nav { background:#6c757d; color:#fff; padding:8px; text-align:right;}
 nav a { color:#fff; text-decoration:none; margin:0 5px; font-size:15px;}
 nav a:hover { text-decoration:underline;}
-main { margin:20px; display:flex; flex-wrap:wrap; justify-content:center;}
-.product { background:#fff; margin:10px; padding:10px; border-radius:8px; width:150px; box-shadow:0 0 5px rgba(0,0,0,0.1);}
-.product img { width:100%; height:auto; border-radius:8px; }
-.product button { margin:3px; padding:4px 8px; font-size:13px; border:none; border-radius:4px; cursor:pointer;}
-.buyBtn { background:#007bff; color:#fff;}
-.buyBtn:hover { background:#0056b3;}
-.likeBtn { background:#dc3545; color:#fff;}
-.likeBtn:hover { background:#a71d2a;}
+main { margin:20px;}
+.products { display:flex; flex-wrap:wrap; justify-content:center;}
+.product { border:1px solid #ddd; border-radius:8px; padding:10px; margin:8px; width:160px;}
+.product img { width:140px; height:140px; object-fit:cover; border-radius:4px;}
+button { margin-top:5px; padding:4px 10px; font-size:13px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;}
+button:hover { background:#555;}
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd;}
 </style>
 </head>
 <body>
 
-<header>🏬 المتجر</header>
+<header>🏬 متجر المنتجات</header>
 
 <nav>
   <a href="index.html">🏬 المتجر</a> |
   <a href="register.html">📝 التسجيل</a> |
   <a href="myPurchases.html">🛒 مشترياتي</a> |
-  <a href="admin.html">⚙️ الإدارة</a>
+  <a href="#" onclick="logoutUser()">🚪 تسجيل خروج</a>
 </nav>
 
-<main id="productsList">
-  <!-- المنتجات ستظهر هنا -->
+<main>
+  <h3>📦 السلع المتاحة:</h3>
+  <div class="products" id="productList">
+    <!-- المنتجات ستظهر هنا -->
+  </div>
 </main>
 
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-// جلب المنتجات من localStorage
-function loadProducts(){
-  let products = JSON.parse(localStorage.getItem('products') || "[]");
-  let html = "";
-  products.forEach((item,index)=>{
-    html += `<div class="product">
-      <img src="${item.img}" alt="${item.name}">
-      <div><strong>🏷️ ${item.name}</strong></div>
-      <div>💰 ${item.price} جنيه</div>
-      <div>📋 ${item.details || ""}</div>
-      <button class="likeBtn" onclick="likeProduct(${index})">❤️ إعجاب</button>
-      <button class="buyBtn" onclick="buyProduct(${index})">🛒 شراء</button>
-    </div>`;
+// ✅ التحقق من الجلسة
+let loggedUser = JSON.parse(localStorage.getItem('loggedUser'));
+if(!loggedUser){
+  alert("❌ يجب تسجيل الدخول أولاً");
+  location.href = "register.html";
+}
+
+// 📦 جلب المنتجات من localStorage وعرضها
+let products = JSON.parse(localStorage.getItem('products') || "[]");
+
+// فلترة المنتجات المكتملة (لها اسم، سعر، صورة)
+products = products.filter(p => p.name && p.price && p.img);
+
+let html = "";
+products.forEach((p,index)=>{
+  html += `
+    <div class="product">
+      <img src="${p.img}">
+      <br/><b>${p.name}</b>
+      <br/>السعر: ${p.price} جنيه
+      <br/>${p.details || ''}
+      <br/>
+      <button onclick="likeProduct(${index})">❤️ إعجاب</button>
+      <button onclick="buyProduct(${index})">🛒 شراء</button>
+    </div>
+  `;
+});
+document.getElementById('productList').innerHTML = html;
+
+// ❤️ إعجاب بالمنتج (مجرد إشعار)
+function likeProduct(i){
+  alert("❤️ أعجبك المنتج: " + products[i].name);
+}
+
+// 🛒 شراء المنتج
+function buyProduct(i){
+  let p = products[i];
+  let purchases = JSON.parse(localStorage.getItem('purchases') || "[]");
+  purchases.push({
+    userCode: loggedUser.code,
+    name: p.name,
+    price: p.price,
+    img: p.img,
+    details: p.details,
+    time: new Date()
   });
-  document.getElementById('productsList').innerHTML = html || "<p>لا توجد منتجات متاحة</p>";
+  localStorage.setItem('purchases', JSON.stringify(purchases));
+
+  // إرسال بريد عند الشراء باستخدام EmailJS (لو مُعد)
+  if(localStorage.getItem('adminEmail')){
+    emailjs.send("service_48zkysa", "template_ntfbz2v", {
+      to_email: localStorage.getItem('adminEmail'),
+      user_name: loggedUser.name,
+      user_code: loggedUser.code,
+      product_name: p.name,
+      product_price: p.price,
+      date: new Date().toLocaleString()
+    }).then(()=>{
+      alert("✅ تم الشراء وتم إرسال إشعار بالبريد");
+    },()=>{
+      alert("⚠️ تم الشراء لكن لم يتم إرسال الإشعار بالبريد");
+    });
+  } else {
+    alert("✅ تم الشراء");
+  }
 }
 
-// إعجاب بالمنتج
-function likeProduct(index){
-  alert("❤️ تم إضافة المنتج للمفضلة (تجريبي)");
+// 🚪 تسجيل الخروج
+function logoutUser(){
+  localStorage.removeItem('loggedUser');
+  alert("👋 تم تسجيل الخروج");
+  location.href = "register.html";
 }
 
-// شراء المنتج + إرسال إيميل
-function buyProduct(index){
-  let products = JSON.parse(localStorage.getItem('products') || "[]");
-  let product = products[index];
-  let myPurchases = JSON.parse(localStorage.getItem('myPurchases') || "[]");
-  myPurchases.push({ name: product.name, price: product.price, img: product.img, details: product.details, time: Date.now() });
-  localStorage.setItem('myPurchases', JSON.stringify(myPurchases));
-  alert("✅ تم شراء المنتج بنجاح!");
+// 🧩 التقاط تسجيل خروج في تبويبة أخرى
+window.addEventListener('storage', function(e){
+  if(e.key === 'loggedUser' && e.newValue === null){
+    alert("👋 تم تسجيل خروجك في تبويبة أخرى");
+    location.href = "register.html";
+  }
+});
+</script>
 
-  // إرسال إيميل (بشكل تجريبي نطبع في الكونسول)
-  let email = localStorage.getItem('targetEmail') || "mahmoudadelsaleh@gmail.com";
-  console.log("📧 إرسال إيميل إلى: "+email);
-  console.log("المنتج: "+product.name+" | السعر: "+product.price);
-  // هنا المفروض تستخدم EmailJS أو غيره لتنفيذ الإرسال الحقيقي
-}
-
-// تحميل عند فتح الصفحة
-loadProducts();
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+  emailjs.init("5eKkOQU28_S0Fon2x"); // مفتاحك العام
 </script>
 
 </body>
