@@ -5,21 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>📝 التسجيل</title>
 <style>
-body { font-family:'Tahoma',sans-serif; background:#f9f9f9; margin:0; padding:0; text-align:center; direction:rtl;}
-header { background:#17a2b8; color:#fff; padding:15px; font-size:22px;}
-nav { background:#17a2b8; color:#fff; padding:8px; text-align:right;}
+body { font-family:'Tahoma',sans-serif; background:#fff; margin:0; padding:0; text-align:center; direction:rtl;}
+header { background:#6c757d; color:#fff; padding:15px; font-size:22px;}
+nav { background:#6c757d; color:#fff; padding:8px; text-align:right;}
 nav a { color:#fff; text-decoration:none; margin:0 5px; font-size:15px;}
 nav a:hover { text-decoration:underline;}
-main { margin:30px;}
+main { margin:20px;}
 input { padding:8px; margin:5px; font-size:15px; border:1px solid #ccc; border-radius:4px; width:220px;}
-button { margin:5px; padding:6px 12px; font-size:14px; background:#17a2b8; color:#fff; border:none; border-radius:4px; cursor:pointer;}
-button:hover { background:#117a8b;}
+button { margin:5px; padding:6px 12px; font-size:14px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;}
+button:hover { background:#555;}
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd;}
 </style>
 </head>
 <body>
 
-<header>📝 التسجيل</header>
+<header>📝 صفحة التسجيل</header>
 
 <nav>
   <a href="index.html">🏬 المتجر</a> |
@@ -31,71 +31,75 @@ footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; col
 <main>
   <h3>تسجيل مستخدم جديد</h3>
   <input type="text" id="fullName" placeholder="الاسم الثلاثي"><br/>
-  <input type="text" id="phone" placeholder="رقم الموبايل 11 رقم"><br/>
-  <input type="number" id="userCode" placeholder="كود من 2006 حتى 9998"><br/>
-  <button onclick="registerUser()">تسجيل</button>
+  <input type="text" id="phoneNumber" placeholder="رقم الهاتف (11 رقم يبدأ بـ0)"><br/>
+  <input type="number" id="userCode" placeholder="الكود (بين 2006–9998)"><br/>
+  <button onclick="registerUser()">✅ تسجيل جديد</button>
+
+  <hr/>
+
+  <h3>تسجيل دخول</h3>
+  <input type="text" id="loginPhone" placeholder="رقم الهاتف"><br/>
+  <input type="number" id="loginCode" placeholder="الكود"><br/>
+  <button onclick="loginUser()">🚀 تسجيل دخول</button>
 </main>
 
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
+// تسجيل مستخدم جديد
 function registerUser(){
   let name = document.getElementById('fullName').value.trim();
-  let phone = document.getElementById('phone').value.trim();
-  let code = parseInt(document.getElementById('userCode').value);
+  let phone = document.getElementById('phoneNumber').value.trim();
+  let code = parseInt(document.getElementById('userCode').value.trim());
+  let users = JSON.parse(localStorage.getItem('users') || "[]");
 
-  // تحقق من الاسم الثلاثي
-  let words = name.split(' ').filter(w => w.length>0);
-  if(words.length !== 3){
-    alert("❌ يجب إدخال الاسم ثلاثيًا");
+  // التحقق
+  if(name.split(' ').length < 3){
+    alert("❌ يجب إدخال الاسم الثلاثي كاملًا");
     return;
   }
-
-  // تحقق أن الاسم حروف فقط (عربي أو إنجليزي)
-  let nameRegex = /^[\u0600-\u06FFa-zA-Z\s]+$/;
-  if(!nameRegex.test(name)){
-    alert("❌ الاسم يجب أن يكون حروفًا فقط");
+  if(!/^[0][0-9]{10}$/.test(phone)){
+    alert("❌ رقم الهاتف يجب أن يبدأ بـ0 ويتكون من 11 رقم");
     return;
   }
-
-  // تحقق من رقم الموبايل: 11 رقم يبدأ بـ0
-  let phoneRegex = /^0\d{10}$/;
-  if(!phoneRegex.test(phone)){
-    alert("❌ رقم الهاتف غير صحيح، يجب أن يكون 11 رقمًا يبدأ بـ0");
-    return;
-  }
-
-  // تحقق من الكود: بين 2006 و 9998
-  if(code < 2006 || code > 9998){
+  if(isNaN(code) || code<2006 || code>9998){
     alert("❌ الكود يجب أن يكون بين 2006 و 9998");
     return;
   }
-
-  let users = JSON.parse(localStorage.getItem('users') || "[]");
-
-  // التحقق من التكرار
-  if(users.some(u => u.code === code)){
-    alert("❌ هذا الكود مستخدم بالفعل");
+  if(users.find(u => u.phone === phone)){
+    alert("❌ رقم الهاتف مسجل من قبل");
     return;
   }
-  if(users.some(u => u.name === name)){
-    alert("❌ هذا الاسم مسجل بالفعل");
+  if(users.find(u => u.name === name)){
+    alert("❌ الاسم مسجل من قبل");
     return;
   }
-  if(users.some(u => u.phone === phone)){
-    alert("❌ رقم الهاتف مسجل بالفعل");
+  if(users.find(u => u.code == code)){
+    alert("❌ الكود مستخدم بالفعل");
     return;
   }
 
-  // إضافة المستخدم
-  users.push({ name, phone, code });
+  users.push({name, phone, code});
   localStorage.setItem('users', JSON.stringify(users));
-
   alert("✅ تم التسجيل بنجاح!");
-  // مسح الحقول
-  document.getElementById('fullName').value = "";
-  document.getElementById('phone').value = "";
-  document.getElementById('userCode').value = "";
+  document.getElementById('fullName').value="";
+  document.getElementById('phoneNumber').value="";
+  document.getElementById('userCode').value="";
+}
+
+// تسجيل الدخول
+function loginUser(){
+  let phone = document.getElementById('loginPhone').value.trim();
+  let code = document.getElementById('loginCode').value.trim();
+  let users = JSON.parse(localStorage.getItem('users') || "[]");
+  let found = users.find(u => u.phone === phone && u.code == code);
+  if(found){
+    sessionStorage.setItem('loggedUser', JSON.stringify(found));
+    alert("✅ تم تسجيل الدخول!");
+    location.href = "myPurchases.html";
+  } else {
+    alert("❌ بيانات غير صحيحة");
+  }
 }
 </script>
 
