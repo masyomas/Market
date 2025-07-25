@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📋 مطابقة الفاتورة</title>
+<style>
+body { font-family:'Tahoma',sans-serif; margin:20px; background:#f9f9f9; }
+h3 { color:#007bff; }
+select, textarea, button { width:100%; margin:10px 0; padding:6px; border-radius:4px; border:1px solid #ccc; }
+button { background:#28a745; color:#fff; cursor:pointer; }
+button:hover { background:#218838; }
+</style>
+</head>
+<body>
+
+<h3>📋 مطابقة الفاتورة</h3>
+
+<label for="clientSelect">اختر كود العميل:</label>
+<select id="clientSelect" onchange="showProducts()">
+  <option value="">-- اختر كود العميل --</option>
+</select>
+
+<label for="productsBox">جميع السلع التي اشتراها العميل:</label>
+<textarea id="productsBox" rows="6" readonly></textarea>
+
+<button onclick="matchInvoice()">🧾 مطابقة الفاتورة</button>
+
+<script>
+// جلب المستخدمين والمشتريات من localStorage
+let users = JSON.parse(localStorage.getItem('users') || "[]");
+let purchases = JSON.parse(localStorage.getItem('purchases') || "[]");
+
+// تعبئة القائمة المنسدلة بأكواد العملاء
+let select = document.getElementById('clientSelect');
+users.forEach(u=>{
+  if(u.role=="user"){
+    let opt = document.createElement('option');
+    opt.value = u.code;
+    opt.text = `${u.name} - كود: ${u.code}`;
+    select.appendChild(opt);
+  }
+});
+
+// عند اختيار كود عميل نعرض سلع مشترياته
+function showProducts(){
+  let code = document.getElementById('clientSelect').value;
+  if(!code) { document.getElementById('productsBox').value=""; return; }
+
+  let userPurchases = purchases.filter(p=>p.code==code);
+  let productsList = userPurchases.map(p=>p.product).join('\n');
+  document.getElementById('productsBox').value = productsList || "لا توجد مشتريات.";
+}
+
+// عند الضغط على زر مطابقة الفاتورة
+function matchInvoice(){
+  alert("📄 تم الضغط على زر مطابقة الفاتورة!\nيمكنك هنا برمجة ما تريد تنفيذه.");
+}
+</script>
+
+</body>
+</html>
