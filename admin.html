@@ -10,7 +10,7 @@ header { background:#6c757d; color:#fff; padding:12px; font-size:20px; text-alig
 nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px; border-top:1px solid #ddd; border-bottom:1px solid #ddd;}
 nav a { text-decoration:none; color:#333; font-size:14px;}
 nav a:hover { color:#007bff;}
-section { margin:10px auto; width:95%; max-width:700px;}
+section { margin:10px auto; width:95%; max-width:750px;}
 h3 { background:#007bff; color:#fff; padding:6px; border-radius:4px; font-size:17px;}
 input[type=text], input[type=number], input[type=file] { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
 button { background:#28a745; color:#fff; padding:6px 10px; border:none; border-radius:4px; cursor:pointer; margin:4px 0;}
@@ -18,10 +18,8 @@ button:hover { background:#218838;}
 .logoutBtn { background:#dc3545; }
 .logoutBtn:hover { background:#c82333;}
 table { width:100%; border-collapse:collapse; margin-top:8px;}
-td, th { border:1px solid #ccc; padding:4px; font-size:13px;}
+td, th { border:1px solid #ccc; padding:4px; font-size:13px; text-align:center;}
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px;}
-.green {color:green;}
-.red {color:red;}
 </style>
 </head>
 <body>
@@ -35,7 +33,7 @@ footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; col
 </nav>
 
 <section id="adminSection">
-  <!-- المحتوى يظهر بعد التحقق -->
+  <!-- المحتوى سيظهر هنا -->
 </section>
 
 <footer>💎 Powered by Almasa 💎</footer>
@@ -58,7 +56,7 @@ function renderAdmin(){
 
   if(logged.role==="superadmin"){
     html+=`
-    <h3>إعداد المدراء</h3>
+    <h3>إدارة المدراء</h3>
     <table>
       <tr><th>الاسم</th><th>الهاتف</th><th>الكود</th></tr>`;
     users.filter(u=>u.role==="admin").forEach((u,i)=>{
@@ -81,28 +79,39 @@ function renderAdmin(){
   <input type="text" id="pDetails" placeholder="تفاصيل السلعة">
   <input type="file" id="pImg">
   <button onclick="addProduct()">إضافة</button>
-  
+
   <h3>السلع المضافة</h3>`;
   if(products.length){
     html+=`<table>
-    <tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>تفاصيل</th><th>حذف</th></tr>`;
+    <tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>تفاصيل</th><th>تعديل</th><th>حذف</th></tr>`;
     products.forEach((p,i)=>{
       html+=`<tr>
       <td><img src="${p.img||'https://via.placeholder.com/50'}" width="50"></td>
       <td>${p.name}</td>
-      <td>${p.price}</td>
+      <td><input type="number" value="${p.price}" onchange="updatePrice(${i},this.value)"></td>
       <td>${p.details}</td>
-      <td><button onclick="delProduct(${i})">🗑️</button></td></tr>`;
+      <td>✅</td>
+      <td><button onclick="delProduct(${i})">🗑️</button></td>
+      </tr>`;
     });
     html+=`</table>`;
   }else{ html+=`<p>لا توجد سلع بعد.</p>`; }
 
-  html+=`<h3>المبيعات</h3>`;
+  html+=`<h3>سجل المبيعات</h3>`;
   if(purchases.length){
     html+=`<table>
-    <tr><th>العميل</th><th>الكود</th><th>السلعة</th><th>الكمية</th><th>السعر</th><th>التاريخ</th></tr>`;
+    <tr><th>العميل</th><th>الكود</th><th>📞 الهاتف</th><th>السلعة</th><th>الكمية</th><th>السعر</th><th>التاريخ</th></tr>`;
     purchases.forEach(p=>{
-      html+=`<tr><td>${p.name}</td><td>${p.code}</td><td>${p.product}</td><td>${p.qty}</td><td>${p.price}</td><td>${p.date}</td></tr>`;
+      let user=users.find(u=>u.code==p.code);
+      html+=`<tr>
+      <td>${p.name}</td>
+      <td>${p.code}</td>
+      <td><a href="tel:${user?.phone||''}">${user?.phone||'غير مسجل'}</a></td>
+      <td>${p.product}</td>
+      <td>${p.qty}</td>
+      <td>${p.price}</td>
+      <td>${p.date}</td>
+      </tr>`;
     });
     html+=`</table>`;
   }else{ html+=`<p>لا توجد مبيعات بعد.</p>`; }
@@ -141,6 +150,13 @@ function delProduct(i){
     products.splice(i,1);
     localStorage.setItem('products', JSON.stringify(products));
     renderAdmin();
+  }
+}
+
+function updatePrice(i,newPrice){
+  if(newPrice>0){
+    products[i].price=parseFloat(newPrice);
+    localStorage.setItem('products', JSON.stringify(products));
   }
 }
 
