@@ -5,23 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🏬 المتجر</title>
 <style>
-body { font-family:'Tahoma',sans-serif; background:#fff; margin:0; padding:0; text-align:center; direction:rtl;}
+body { font-family:'Tahoma',sans-serif; margin:0; padding:0; text-align:center; background:#fff;}
 header { background:#6c757d; color:#fff; padding:15px; font-size:22px;}
-nav { background:#6c757d; color:#fff; padding:8px; text-align:right;}
-nav a { color:#fff; text-decoration:none; margin:0 5px; font-size:15px;}
+nav { background:#6c757d; color:#fff; padding:8px;}
+nav a { color:#fff; text-decoration:none; margin:0 5px; font-size:14px;}
 nav a:hover { text-decoration:underline;}
-main { margin:20px;}
-.products { display:flex; flex-wrap:wrap; justify-content:center;}
-.product { border:1px solid #ddd; border-radius:8px; padding:10px; margin:8px; width:160px;}
-.product img { width:140px; height:140px; object-fit:cover; border-radius:4px;}
-button { margin-top:5px; padding:4px 10px; font-size:13px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;}
+main { display:flex; flex-wrap:wrap; justify-content:center; margin:10px;}
+.product { border:1px solid #ddd; border-radius:8px; padding:8px; margin:5px; width:45%; box-sizing:border-box;}
+.product img { width:100%; max-height:120px; object-fit:cover; border-radius:6px;}
+.product h4 { margin:5px 0; font-size:15px;}
+.product p { margin:2px 0; font-size:13px; color:#555;}
+button { margin-top:5px; padding:4px 10px; font-size:12px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;}
 button:hover { background:#555;}
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd;}
 </style>
 </head>
 <body>
 
-<header>🏬 متجر المنتجات</header>
+<header>🏬 المتجر</header>
 
 <nav>
   <a href="index.html">🏬 المتجر</a> |
@@ -30,103 +31,66 @@ footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; col
   <a href="#" onclick="logoutUser()">🚪 تسجيل خروج</a>
 </nav>
 
-<main>
-  <h3>📦 السلع المتاحة:</h3>
-  <div class="products" id="productList">
-    <!-- المنتجات ستظهر هنا -->
-  </div>
+<main id="productList">
+<!-- سيتم إدراج السلع هنا -->
 </main>
 
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-// ✅ التحقق من الجلسة
-let loggedUser = JSON.parse(localStorage.getItem('loggedUser'));
-if(!loggedUser){
-  alert("❌ يجب تسجيل الدخول أولاً");
-  location.href = "register.html";
-}
+// تحميل السلع من localStorage
+let products = JSON.parse(localStorage.getItem('products')||"[]");
+let container = document.getElementById('productList');
 
-// 📦 جلب المنتجات من localStorage وعرضها
-let products = JSON.parse(localStorage.getItem('products') || "[]");
-
-// فلترة المنتجات المكتملة (لها اسم، سعر، صورة)
-products = products.filter(p => p.name && p.price && p.img);
-
-let html = "";
-products.forEach((p,index)=>{
-  html += `
+if(products.length===0){
+  container.innerHTML="<p>⚠️ لا توجد سلع متاحة حاليا</p>";
+}else{
+  let html="";
+  products.forEach((p,idx)=>{
+    let img = p.img && p.img.trim()!=="" ? p.img : "picture/empty.jpg";
+    html+=`
     <div class="product">
-      <img src="${p.img}">
-      <br/><b>${p.name}</b>
-      <br/>السعر: ${p.price} جنيه
-      <br/>${p.details || ''}
-      <br/>
-      <button onclick="likeProduct(${index})">❤️ إعجاب</button>
-      <button onclick="buyProduct(${index})">🛒 شراء</button>
-    </div>
-  `;
-});
-document.getElementById('productList').innerHTML = html;
-
-// ❤️ إعجاب بالمنتج (مجرد إشعار)
-function likeProduct(i){
-  alert("❤️ أعجبك المنتج: " + products[i].name);
-}
-
-// 🛒 شراء المنتج
-function buyProduct(i){
-  let p = products[i];
-  let purchases = JSON.parse(localStorage.getItem('purchases') || "[]");
-  purchases.push({
-    userCode: loggedUser.code,
-    name: p.name,
-    price: p.price,
-    img: p.img,
-    details: p.details,
-    time: new Date()
+      <img src="${img}" alt="${p.name}">
+      <h4>${p.name}</h4>
+      <p>السعر: ${p.price} جنيه</p>
+      <p>${p.details||""}</p>
+      <button onclick="buyProduct(${idx})">🛒 شراء</button>
+    </div>`;
   });
-  localStorage.setItem('purchases', JSON.stringify(purchases));
-
-  // إرسال بريد عند الشراء باستخدام EmailJS (لو مُعد)
-  if(localStorage.getItem('adminEmail')){
-    emailjs.send("service_48zkysa", "template_ntfbz2v", {
-      to_email: localStorage.getItem('adminEmail'),
-      user_name: loggedUser.name,
-      user_code: loggedUser.code,
-      product_name: p.name,
-      product_price: p.price,
-      date: new Date().toLocaleString()
-    }).then(()=>{
-      alert("✅ تم الشراء وتم إرسال إشعار بالبريد");
-    },()=>{
-      alert("⚠️ تم الشراء لكن لم يتم إرسال الإشعار بالبريد");
-    });
-  } else {
-    alert("✅ تم الشراء");
-  }
+  container.innerHTML=html;
 }
 
-// 🚪 تسجيل الخروج
+// شراء سلعة
+function buyProduct(idx){
+  let loggedUser=JSON.parse(localStorage.getItem('loggedUser'));
+  if(!loggedUser){
+    alert("⚠️ يجب تسجيل الدخول أولاً");
+    location.href="register.html";
+    return;
+  }
+  let p=products[idx];
+  let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
+  purchases.push({ userCode:loggedUser.code, name:p.name, price:p.price, date:new Date().toLocaleString() });
+  localStorage.setItem('purchases',JSON.stringify(purchases));
+
+  let email=localStorage.getItem('adminEmail')||"mahmoudadelsaleh@gmail.com";
+  alert(`✅ تم شراء ${p.name}\nسيتم إرسال إشعار إلى ${email}`);
+}
+
+// تسجيل خروج
 function logoutUser(){
   localStorage.removeItem('loggedUser');
   alert("👋 تم تسجيل الخروج");
-  location.href = "register.html";
+  location.href="register.html";
 }
 
-// 🧩 التقاط تسجيل خروج في تبويبة أخرى
-window.addEventListener('storage', function(e){
-  if(e.key === 'loggedUser' && e.newValue === null){
+// التقاط تسجيل خروج في تبويبة أخرى
+window.addEventListener('storage',function(e){
+  if(e.key==='loggedUser' && e.newValue===null){
     alert("👋 تم تسجيل خروجك في تبويبة أخرى");
-    location.href = "register.html";
+    location.href='register.html';
   }
 });
-</script>
-
-<!-- EmailJS SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-<script>
-  emailjs.init("5eKkOQU28_S0Fon2x"); // مفتاحك العام
 </script>
 
 </body>
