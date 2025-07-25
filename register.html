@@ -1,130 +1,85 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📝 التسجيل / تسجيل الدخول</title>
+<title>🔑 تسجيل الدخول</title>
 <style>
-body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; text-align:center; direction:rtl;}
+body { font-family:'Tahoma',sans-serif; margin:0; padding:0; text-align:center; background:#fff;}
 header { background:#6c757d; color:#fff; padding:15px; font-size:22px;}
-nav { background:#6c757d; color:#fff; padding:8px; text-align:right;}
-nav a { color:#fff; text-decoration:none; margin:0 5px; font-size:15px;}
-nav a:hover { text-decoration:underline;}
-main { margin:20px;}
-input { width:70%; padding:6px; margin:6px; font-size:14px;}
-button { margin-top:10px; padding:6px 15px; font-size:14px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;}
+section { margin:20px auto; width:90%; max-width:400px;}
+input { padding:6px; margin:6px auto; width:80%; max-width:250px;}
+button { padding:6px 12px; margin-top:10px; font-size:14px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;}
 button:hover { background:#555;}
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd;}
-.box { border:1px solid #ddd; border-radius:8px; padding:10px; margin:10px auto; width:80%; max-width:400px;}
 </style>
 </head>
 <body>
 
-<header>📝 التسجيل أو تسجيل الدخول</header>
+<header>🔑 تسجيل الدخول</header>
 
-<nav>
-  <a href="index.html">🏬 المتجر</a> |
-  <a href="register.html">📝 التسجيل</a> |
-  <a href="myPurchases.html">🛒 مشترياتي</a> |
-  <a href="#" onclick="logoutUser()">🚪 تسجيل خروج</a>
-</nav>
-
-<main>
-  <div class="box">
-    <h3>✨ تسجيل مستخدم جديد</h3>
-    <input type="text" id="name" placeholder="الاسم الثلاثي"><br/>
-    <input type="text" id="phone" placeholder="رقم الهاتف (11 رقم يبدأ بـ0)"><br/>
-    <input type="number" id="code" placeholder="كود بين 2006 و 9998"><br/>
-    <button onclick="registerUser()">✅ تسجيل جديد</button>
-  </div>
-
-  <div class="box">
-    <h3>🔑 تسجيل دخول</h3>
-    <input type="text" id="loginPhone" placeholder="رقم الهاتف"><br/>
-    <input type="number" id="loginCode" placeholder="الكود"><br/>
-    <button onclick="loginUser()">🚀 دخول</button>
-  </div>
-</main>
+<section>
+  <input type="text" id="phone" placeholder="رقم الموبايل"><br/>
+  <input type="number" id="code" placeholder="الكود"><br/>
+  <button onclick="loginUser()">✅ تسجيل الدخول</button>
+</section>
 
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-// ✅ التحقق في البداية: هل فيه جلسة نشطة؟
-let loggedUser = JSON.parse(localStorage.getItem('loggedUser'));
-if(loggedUser){
-  alert("✅ أنت بالفعل مسجل دخول باسم: " + loggedUser.name);
-  location.href = "index.html";
+// بيانات سوبر أدمين
+let superAdmin = { phone:"01552402913", code:790707071 };
+
+// أكواد المدراء (يتم تحميلها من localStorage أو إعدادها لأول مرة)
+let defaultAdmins = [
+  {name:"admin1", phone:"01111111111", code:9999},
+  {name:"admin2", phone:"01111111112", code:9998},
+  {name:"admin3", phone:"01111111113", code:9997},
+  {name:"admin4", phone:"01111111114", code:9996},
+  {name:"admin5", phone:"01111111115", code:9995}
+];
+if(!localStorage.getItem('admins')){
+  localStorage.setItem('admins', JSON.stringify(defaultAdmins));
 }
 
-// 📝 تسجيل مستخدم جديد
-function registerUser(){
-  let name = document.getElementById('name').value.trim();
-  let phone = document.getElementById('phone').value.trim();
-  let code = parseInt(document.getElementById('code').value.trim());
-
-  if(!/^[\u0600-\u06FF\s]{3,}$/.test(name) || name.split(" ").length < 3){
-    alert("⚠️ يجب إدخال اسم ثلاثي باللغة العربية");
-    return;
-  }
-  if(!/^0\d{10}$/.test(phone)){
-    alert("⚠️ يجب أن يكون رقم الهاتف 11 رقم ويبدأ بـ0");
-    return;
-  }
-  if(isNaN(code) || code<2006 || code>9998){
-    alert("⚠️ الكود يجب أن يكون بين 2006 و 9998");
-    return;
-  }
-
-  let users = JSON.parse(localStorage.getItem('users') || "[]");
-  if(users.find(u=>u.name===name)){
-    alert("⚠️ الاسم مسجل بالفعل");
-    return;
-  }
-  if(users.find(u=>u.phone===phone)){
-    alert("⚠️ رقم الهاتف مسجل بالفعل");
-    return;
-  }
-  if(users.find(u=>u.code===code)){
-    alert("⚠️ الكود مستخدم بالفعل");
-    return;
-  }
-
-  let newUser = { name:name, phone:phone, code:code };
-  users.push(newUser);
-  localStorage.setItem('users', JSON.stringify(users));
-  localStorage.setItem('loggedUser', JSON.stringify(newUser));
-  alert("✅ تم التسجيل بنجاح! مرحبًا بك، " + name);
-  location.href = "index.html";
-}
-
-// 🔑 تسجيل دخول مستخدم مسجل
 function loginUser(){
-  let phone = document.getElementById('loginPhone').value.trim();
-  let code = parseInt(document.getElementById('loginCode').value.trim());
-  let users = JSON.parse(localStorage.getItem('users') || "[]");
+  let phone=document.getElementById('phone').value.trim();
+  let code=parseInt(document.getElementById('code').value.trim());
+  if(!phone || isNaN(code)){ alert("⚠️ أدخل رقم الموبايل والكود"); return; }
 
-  let found = users.find(u=>u.phone===phone && u.code===code);
-  if(found){
-    localStorage.setItem('loggedUser', JSON.stringify(found));
-    alert("✅ مرحبًا بعودتك، " + found.name);
-    location.href = "index.html";
-  } else {
-    alert("❌ بيانات غير صحيحة");
+  let admins=JSON.parse(localStorage.getItem('admins')||"[]");
+
+  if(phone===superAdmin.phone && code===superAdmin.code){
+    // تسجيل دخول كسوبر أدمين
+    localStorage.setItem('loggedUser', JSON.stringify({name:"superadmin", code:superAdmin.code, phone:superAdmin.phone}));
+    location.href="admin.html";
+  }
+  else if(admins.find(a=>a.phone===phone && a.code===code)){
+    // تسجيل دخول كمدير عادي
+    let admin = admins.find(a=>a.phone===phone && a.code===code);
+    localStorage.setItem('loggedUser', JSON.stringify({name:admin.name, code:admin.code, phone:admin.phone}));
+    location.href="admin.html";
+  }
+  else if(code>=2006 && code<=9998){
+    // تسجيل دخول كعميل عادي
+    let users=JSON.parse(localStorage.getItem('users')||"[]");
+    let user=users.find(u=>u.phone===phone && u.code===code);
+    if(user){
+      localStorage.setItem('loggedUser', JSON.stringify({name:user.name, code:user.code, phone:user.phone}));
+      location.href="myPurchases.html";
+    } else {
+      alert("⚠️ لا يوجد مستخدم مسجل بهذه البيانات");
+    }
+  }
+  else{
+    alert("⚠️ بيانات غير صحيحة");
   }
 }
 
-// 🚪 تسجيل الخروج
-function logoutUser(){
-  localStorage.removeItem('loggedUser');
-  alert("👋 تم تسجيل الخروج");
-  location.href = "register.html";
-}
-
-// 🧩 التقاط تسجيل خروج في تبويبة أخرى
-window.addEventListener('storage', function(e){
-  if(e.key === 'loggedUser' && e.newValue === null){
-    alert("👋 تم تسجيل خروجك في تبويبة أخرى");
-    location.href = "register.html";
+// التقاط تسجيل خروج في تبويبة أخرى
+window.addEventListener('storage',function(e){
+  if(e.key==='loggedUser' && e.newValue===null){
+    alert("👋 تم تسجيل خروجك");
   }
 });
 </script>
