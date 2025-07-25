@@ -34,7 +34,7 @@ footer { background:#f1f1f1; text-align:center; padding:6px; font-size:12px; col
 </nav>
 
 <section id="storeSection">
-  <!-- المنتجات تظهر هنا -->
+  <p>⏳ جاري تحميل السلع...</p>
 </section>
 
 <footer>💎 Powered by Almasa 💎</footer>
@@ -42,7 +42,6 @@ footer { background:#f1f1f1; text-align:center; padding:6px; font-size:12px; col
 <script>
 let logged=JSON.parse(localStorage.getItem('loggedUser'));
 let bonus=parseFloat(localStorage.getItem('bonus')||"1");
-let products=JSON.parse(localStorage.getItem('products')||"[]");
 let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
 
 // تحديث الشريط المتحرك
@@ -63,46 +62,52 @@ function calcUserBonus(){
   return total*(bonus/100);
 }
 
-// عرض السلع
-function renderStore(){
-  let html="";
-  if(products.length){
-    products.forEach((p,i)=>{
-      html+=`
-      <div class="card">
-        <img src="${p.img||'https://via.placeholder.com/150'}">
-        <h4>${p.name}</h4>
-        <p>السعر: ${p.price} جنيه</p>
-        <p style="font-size:12px;color:#555;">${p.details}</p>
-        <label>الكمية:
-        <select id="qty_${i}">
-          ${Array.from({length:9},(_,n)=>`<option>${n+1}</option>`).join('')}
-        </select></label>
-        <button onclick="buy(${i})">شراء</button>
-      </div>`;
-    });
-  }else{
-    html="<p>⚠️ لا توجد سلع بعد.</p>";
+// جلب السلع من ملف JSON
+async function loadProducts(){
+  try{
+    let res=await fetch('products.json');
+    let products=await res.json();
+    renderStore(products);
+  }catch(e){
+    document.getElementById('storeSection').innerHTML="<p>⚠️ تعذر تحميل السلع.</p>";
   }
+}
+
+// عرض السلع
+function renderStore(products){
+  let html="";
+  products.forEach((p,i)=>{
+    html+=`
+    <div class="card">
+      <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'">
+      <h4>${p.name}</h4>
+      <p>السعر: ${p.price} جنيه</p>
+      <p style="font-size:12px;color:#555;">${p.details}</p>
+      <label>الكمية:
+      <select id="qty_${i}">
+        ${Array.from({length:9},(_,n)=>`<option>${n+1}</option>`).join('')}
+      </select></label>
+      <button onclick="buy(${i},${p.price},'${p.name}')">شراء</button>
+    </div>`;
+  });
   document.getElementById('storeSection').innerHTML=html;
 }
 
 // الشراء
-function buy(i){
+function buy(i,price,name){
   if(!logged){ alert("⚠️ يجب تسجيل الدخول أولًا."); location.href='register.html'; return;}
   let qty=parseInt(document.getElementById(`qty_${i}`).value);
   let date=new Date().toLocaleString('ar');
   purchases.push({
     name:logged.name, code:logged.code,
-    product:products[i].name,
-    qty, price:products[i].price, date
+    product:name, qty, price, date
   });
   localStorage.setItem('purchases',JSON.stringify(purchases));
   alert("✅ تمت عملية الشراء بنجاح!");
 }
 
 updateUserInfo();
-renderStore();
+loadProducts();
 </script>
 
 </body>
