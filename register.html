@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📝 تسجيل مستخدم جديد</title>
+<title>📝 التسجيل / تسجيل الدخول</title>
 <style>
 body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; text-align:center; direction:rtl;}
 header { background:#6c757d; color:#fff; padding:15px; font-size:22px;}
@@ -15,11 +15,12 @@ input { width:70%; padding:6px; margin:6px; font-size:14px;}
 button { margin-top:10px; padding:6px 15px; font-size:14px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;}
 button:hover { background:#555;}
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd;}
+.box { border:1px solid #ddd; border-radius:8px; padding:10px; margin:10px auto; width:80%; max-width:400px;}
 </style>
 </head>
 <body>
 
-<header>📝 تسجيل مستخدم جديد</header>
+<header>📝 التسجيل أو تسجيل الدخول</header>
 
 <nav>
   <a href="index.html">🏬 المتجر</a> |
@@ -29,11 +30,20 @@ footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; col
 </nav>
 
 <main>
-  <h3>أدخل بياناتك للتسجيل</h3>
-  <input type="text" id="name" placeholder="الاسم الثلاثي"><br/>
-  <input type="text" id="phone" placeholder="رقم الهاتف (11 رقم يبدأ بـ0)"><br/>
-  <input type="number" id="code" placeholder="كود بين 2006 و 9998"><br/>
-  <button onclick="registerUser()">✅ تسجيل</button>
+  <div class="box">
+    <h3>✨ تسجيل مستخدم جديد</h3>
+    <input type="text" id="name" placeholder="الاسم الثلاثي"><br/>
+    <input type="text" id="phone" placeholder="رقم الهاتف (11 رقم يبدأ بـ0)"><br/>
+    <input type="number" id="code" placeholder="كود بين 2006 و 9998"><br/>
+    <button onclick="registerUser()">✅ تسجيل جديد</button>
+  </div>
+
+  <div class="box">
+    <h3>🔑 تسجيل دخول</h3>
+    <input type="text" id="loginPhone" placeholder="رقم الهاتف"><br/>
+    <input type="number" id="loginCode" placeholder="الكود"><br/>
+    <button onclick="loginUser()">🚀 دخول</button>
+  </div>
 </main>
 
 <footer>💎 Powered by Almasa 💎</footer>
@@ -52,7 +62,6 @@ function registerUser(){
   let phone = document.getElementById('phone').value.trim();
   let code = parseInt(document.getElementById('code').value.trim());
 
-  // التحقق من صحة البيانات
   if(!/^[\u0600-\u06FF\s]{3,}$/.test(name) || name.split(" ").length < 3){
     alert("⚠️ يجب إدخال اسم ثلاثي باللغة العربية");
     return;
@@ -66,7 +75,6 @@ function registerUser(){
     return;
   }
 
-  // التحقق من التكرار
   let users = JSON.parse(localStorage.getItem('users') || "[]");
   if(users.find(u=>u.name===name)){
     alert("⚠️ الاسم مسجل بالفعل");
@@ -81,13 +89,28 @@ function registerUser(){
     return;
   }
 
-  // إضافة المستخدم
   let newUser = { name:name, phone:phone, code:code };
   users.push(newUser);
   localStorage.setItem('users', JSON.stringify(users));
   localStorage.setItem('loggedUser', JSON.stringify(newUser));
   alert("✅ تم التسجيل بنجاح! مرحبًا بك، " + name);
   location.href = "index.html";
+}
+
+// 🔑 تسجيل دخول مستخدم مسجل
+function loginUser(){
+  let phone = document.getElementById('loginPhone').value.trim();
+  let code = parseInt(document.getElementById('loginCode').value.trim());
+  let users = JSON.parse(localStorage.getItem('users') || "[]");
+
+  let found = users.find(u=>u.phone===phone && u.code===code);
+  if(found){
+    localStorage.setItem('loggedUser', JSON.stringify(found));
+    alert("✅ مرحبًا بعودتك، " + found.name);
+    location.href = "index.html";
+  } else {
+    alert("❌ بيانات غير صحيحة");
+  }
 }
 
 // 🚪 تسجيل الخروج
