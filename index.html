@@ -3,94 +3,92 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏬 المتجر</title>
+<title>🛍️ المتجر</title>
 <style>
-body { font-family:'Tahoma',sans-serif; margin:0; padding:0; text-align:center; background:#fff;}
-header { background:#6c757d; color:#fff; padding:15px; font-size:22px;}
-nav { background:#6c757d; color:#fff; padding:8px;}
-nav a { color:#fff; text-decoration:none; margin:0 5px; font-size:14px;}
-nav a:hover { text-decoration:underline;}
-main { display:flex; flex-wrap:wrap; justify-content:center; margin:10px;}
-.product { border:1px solid #ddd; border-radius:8px; padding:8px; margin:5px; width:45%; box-sizing:border-box;}
-.product img { width:100%; max-height:120px; object-fit:cover; border-radius:6px;}
-.product h4 { margin:5px 0; font-size:15px;}
-.product p { margin:2px 0; font-size:13px; color:#555;}
-button { margin-top:5px; padding:4px 10px; font-size:12px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;}
-button:hover { background:#555;}
-footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd;}
+body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; text-align:center;}
+header { background:#6c757d; color:#fff; padding:12px; font-size:22px;}
+nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd; border-bottom:1px solid #ddd; }
+nav a { text-decoration:none; color:#333; font-size:14px;}
+nav a:hover { color:#007bff; }
+section { margin:10px auto; width:95%; max-width:600px;}
+.product { border:1px solid #ddd; border-radius:6px; margin:10px 0; padding:10px; }
+.product img { width:100%; max-height:200px; object-fit:cover; border-radius:4px;}
+.product-details { text-align:right; margin:6px 0; font-size:14px;}
+.buy-section { margin-top:6px; }
+select.qty { padding:4px; font-size:14px; margin-left:5px;}
+button.buyBtn { padding:4px 10px; font-size:14px; background:#28a745; color:#fff; border:none; border-radius:4px; cursor:pointer;}
+button.buyBtn:hover { background:#1e7e34;}
+footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px;}
 </style>
 </head>
 <body>
 
-<header>🏬 المتجر</header>
+<header>🛍️ المتجر</header>
 
 <nav>
-  <a href="index.html">🏬 المتجر</a> |
-  <a href="register.html">📝 التسجيل</a> |
-  <a href="myPurchases.html">🛒 مشترياتي</a> |
-  <a href="#" onclick="logoutUser()">🚪 تسجيل خروج</a>
+  <a href="index.html">🏠 الرئيسية</a>
+  <a href="mypurchases.html">🛒 مشترياتي</a>
+  <a href="register.html">🔑 حسابي</a>
 </nav>
 
-<main id="productList">
-<!-- سيتم إدراج السلع هنا -->
-</main>
+<section id="productsContainer">
+<!-- سيتم توليد المنتجات هنا -->
+</section>
 
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-// تحميل السلع من localStorage
-let products = JSON.parse(localStorage.getItem('products')||"[]");
-let container = document.getElementById('productList');
+// مصفوفة المنتجات
+let products = [
+  {id:1, name:"سلعة 1", price:100, image:"pictures/product1.jpg", desc:"تفاصيل مختصرة عن السلعة 1"},
+  {id:2, name:"سلعة 2", price:150, image:"pictures/product2.jpg", desc:"تفاصيل مختصرة عن السلعة 2"},
+  {id:3, name:"سلعة 3", price:200, image:"pictures/product3.jpg", desc:"تفاصيل مختصرة عن السلعة 3"}
+  // تقدر تضيف منتجات إضافية هنا بسهولة
+];
 
-if(products.length===0){
-  container.innerHTML="<p>⚠️ لا توجد سلع متاحة حاليا</p>";
-}else{
-  let html="";
-  products.forEach((p,idx)=>{
-    let img = p.img && p.img.trim()!=="" ? p.img : "picture/empty.jpg";
-    html+=`
-    <div class="product">
-      <img src="${img}" alt="${p.name}">
-      <h4>${p.name}</h4>
-      <p>السعر: ${p.price} جنيه</p>
-      <p>${p.details||""}</p>
-      <button onclick="buyProduct(${idx})">🛒 شراء</button>
-    </div>`;
-  });
-  container.innerHTML=html;
-}
+// توليد HTML لكل منتج
+let html = "";
+products.forEach(prod=>{
+  html+=`
+  <div class="product">
+    <img src="${prod.image}" alt="${prod.name}">
+    <div class="product-details">
+      <div><b>${prod.name}</b></div>
+      <div>السعر: ${prod.price} جنيه</div>
+      <div>${prod.desc}</div>
+    </div>
+    <div class="buy-section">
+      <select class="qty" id="qty_${prod.id}">
+        ${[...Array(9)].map((_,i)=>`<option>${i+1}</option>`).join('')}
+      </select>
+      <button class="buyBtn" onclick="buyProduct('${prod.name}','${prod.price}','${prod.image}','qty_${prod.id}')">شراء</button>
+    </div>
+  </div>`;
+});
+document.getElementById('productsContainer').innerHTML=html;
 
-// شراء سلعة
-function buyProduct(idx){
-  let loggedUser=JSON.parse(localStorage.getItem('loggedUser'));
-  if(!loggedUser){
-    alert("⚠️ يجب تسجيل الدخول أولاً");
+// دالة الشراء
+function buyProduct(name,price,image,qtySelectId){
+  let logged=JSON.parse(localStorage.getItem('loggedUser'));
+  if(!logged || logged.role!=="user") {
+    alert("⚠️ يجب تسجيل الدخول أولاً.");
     location.href="register.html";
     return;
   }
-  let p=products[idx];
+  let qty= parseInt(document.getElementById(qtySelectId).value) || 1;
   let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
-  purchases.push({ userCode:loggedUser.code, name:p.name, price:p.price, date:new Date().toLocaleString() });
-  localStorage.setItem('purchases',JSON.stringify(purchases));
-
-  let email=localStorage.getItem('adminEmail')||"mahmoudadelsaleh@gmail.com";
-  alert(`✅ تم شراء ${p.name}\nسيتم إرسال إشعار إلى ${email}`);
-}
-
-// تسجيل خروج
-function logoutUser(){
-  localStorage.removeItem('loggedUser');
-  alert("👋 تم تسجيل الخروج");
-  location.href="register.html";
-}
-
-// التقاط تسجيل خروج في تبويبة أخرى
-window.addEventListener('storage',function(e){
-  if(e.key==='loggedUser' && e.newValue===null){
-    alert("👋 تم تسجيل خروجك في تبويبة أخرى");
-    location.href='register.html';
+  for(let i=0;i<qty;i++){
+    purchases.push({
+      phone: logged.phone,
+      name: name,
+      price: price,
+      image: image,
+      timestamp: Date.now()+i // تفادي نفس التوقيت
+    });
   }
-});
+  localStorage.setItem('purchases', JSON.stringify(purchases));
+  alert(`✅ تم شراء ${qty} قطعة من ${name}`);
+}
 </script>
 
 </body>
