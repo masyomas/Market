@@ -11,6 +11,7 @@
   select, button, textarea { width:90%; padding:8px; margin:8px 0; font-size:15px; border:1px solid #ccc; border-radius:4px; }
   button { background:#28a745; color:#fff; cursor:pointer; }
   button:hover { background:#218838; }
+  #totalBox { margin-top:10px; font-size:17px; font-weight:bold; color:#333; }
   footer { background:#f1f1f1; padding:8px; font-size:13px; color:#777; margin-top:10px; }
 </style>
 </head>
@@ -27,6 +28,8 @@
   <button onclick="matchInvoice()">📋 مطابقة الفاتورة</button>
 
   <textarea id="invoiceBox" rows="8" readonly placeholder="ستظهر هنا أسماء السلع المشتراة..."></textarea>
+  
+  <div id="totalBox">💰 الإجمالي: 0 جنيه</div>
 </section>
 
 <footer>💎 Powered by Almasa 💎</footer>
@@ -54,16 +57,22 @@
     let userPurchases = purchases.filter(p => p.code == code);
     if(userPurchases.length == 0){
       document.getElementById('invoiceBox').value = "📦 لا توجد مشتريات لهذا العميل.";
+      document.getElementById('totalBox').textContent = "💰 الإجمالي: 0 جنيه";
       return;
     }
 
-    // تجميع أسماء السلع (مع الكمية لو موجودة)
     let result = "";
+    let total = 0;
     userPurchases.forEach(p => {
-      result += `• ${p.product} × ${p.qty} بسعر ${p.price} جنيه\n`;
+      let qty = parseInt(p.qty) || 1;
+      let price = parseFloat(p.price) || 0;
+      let subtotal = qty * price;
+      total += subtotal;
+      result += `• ${p.product} × ${qty} بسعر ${price} جنيه = ${subtotal} جنيه\n`;
     });
 
     document.getElementById('invoiceBox').value = result;
+    document.getElementById('totalBox').textContent = `💰 الإجمالي: ${total} جنيه`;
   }
 </script>
 
