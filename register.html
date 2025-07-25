@@ -3,109 +3,128 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📝 التسجيل والدخول</title>
+<title>🔑 التسجيل / تسجيل الدخول</title>
 <style>
-body { font-family:'Tahoma',sans-serif; margin:0; padding:0; text-align:center; background:#fff;}
-header { background:#6c757d; color:#fff; padding:15px; font-size:22px;}
-section { margin:10px auto; width:95%; max-width:400px; border-bottom:1px solid #ddd; padding-bottom:10px;}
-h3 { margin-top:10px; }
-input { padding:6px; margin:4px auto; width:80%; max-width:250px;}
-button { padding:6px 12px; margin:6px auto; font-size:14px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;}
-button:hover { background:#555;}
-footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd;}
+body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; text-align:center;}
+header { background:#6c757d; color:#fff; padding:12px; font-size:22px;}
+nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd; border-bottom:1px solid #ddd;}
+nav a { text-decoration:none; color:#333; font-size:14px;}
+nav a:hover { color:#007bff; }
+section { margin:10px auto; width:90%; max-width:400px;}
+input[type=text], input[type=number] { width:90%; padding:8px; margin:5px 0; border:1px solid #ccc; border-radius:4px;}
+button { background:#007bff; color:#fff; padding:8px 12px; border:none; border-radius:4px; cursor:pointer; margin:5px 0;}
+button:hover { background:#0056b3;}
+.logoutBtn { background:#dc3545; }
+.logoutBtn:hover { background:#c82333;}
+footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px;}
 </style>
 </head>
 <body>
 
-<header>📝 التسجيل والدخول</header>
+<header>🔑 التسجيل / تسجيل الدخول</header>
+
+<nav>
+  <a href="index.html">🏠 المتجر</a>
+  <a href="myPurchases.html">🛒 مشترياتي</a>
+  <a href="register.html">🔑 حسابي</a>
+</nav>
 
 <section>
-  <h3>✨ تسجيل مستخدم جديد</h3>
-  <input type="text" id="newName" placeholder="الاسم الثلاثي"><br/>
-  <input type="text" id="newPhone" placeholder="رقم الموبايل"><br/>
-  <input type="number" id="newCode" placeholder="الكود (2006 - 9998)"><br/>
-  <button onclick="registerNewUser()">✅ تسجيل</button>
-</section>
-
-<section>
-  <h3>🔑 تسجيل الدخول</h3>
-  <input type="text" id="phone" placeholder="رقم الموبايل"><br/>
-  <input type="number" id="code" placeholder="الكود"><br/>
-  <button onclick="loginUser()">➡️ دخول</button>
+  <div id="formsContainer"></div>
 </section>
 
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-// إعداد البيانات أول مرة
-if(!localStorage.getItem('superAdmin')){
-  localStorage.setItem('superAdmin', JSON.stringify({ phone:"01552402912", code:790707071 }));
-}
+// بيانات افتراضية للسوبر أدمين والمدراء
 let defaultAdmins = [
-  {name:"admin1", phone:"01111111111", code:11111},
-  {name:"admin2", phone:"01111111112", code:22222},
-  {name:"admin3", phone:"01111111113", code:33333},
-  {name:"admin4", phone:"01111111114", code:44444},
-  {name:"admin5", phone:"01111111115", code:55555}
+  {name:"Super Admin", phone:"01552402912", code:790707071, role:"superadmin"},
+  {name:"admin1", phone:"01111111111", code:2001, role:"admin"},
+  {name:"admin2", phone:"01111111112", code:2002, role:"admin"},
+  {name:"admin3", phone:"01111111113", code:2003, role:"admin"},
+  {name:"admin4", phone:"01111111114", code:2004, role:"admin"},
+  {name:"admin5", phone:"01111111115", code:2005, role:"admin"},
 ];
-if(!localStorage.getItem('admins')){
-  localStorage.setItem('admins', JSON.stringify(defaultAdmins));
+
+let users=JSON.parse(localStorage.getItem('users')||"[]");
+
+// إضافة المدراء والسوبر أدمين أول مرة فقط
+if(!localStorage.getItem('adminsAdded')){
+  users = users.concat(defaultAdmins);
+  localStorage.setItem('users', JSON.stringify(users));
+  localStorage.setItem('adminsAdded', "yes");
 }
 
-// تسجيل مستخدم جديد
-function registerNewUser(){
+let logged=JSON.parse(localStorage.getItem('loggedUser'));
+
+function renderForms(){
+  let html="";
+  if(!logged){
+    html+=`
+    <h3>تسجيل مستخدم جديد</h3>
+    <input type="text" id="newName" placeholder="الاسم الثلاثي">
+    <input type="text" id="newPhone" placeholder="رقم الموبايل">
+    <input type="number" id="newCode" placeholder="الكود (بين 2001 و 9999)">
+    <button onclick="register()">تسجيل</button>
+
+    <h3>أو تسجيل الدخول</h3>
+    <input type="text" id="loginPhone" placeholder="رقم الموبايل">
+    <input type="number" id="loginCode" placeholder="الكود">
+    <button onclick="login()">دخول</button>
+    `;
+  }else{
+    html+=`
+    <h3>مرحبًا ${logged.name}</h3>
+    <button class="logoutBtn" onclick="logout()">تسجيل خروج</button>
+    `;
+  }
+  document.getElementById('formsContainer').innerHTML=html;
+}
+
+function register(){
   let name=document.getElementById('newName').value.trim();
   let phone=document.getElementById('newPhone').value.trim();
   let code=parseInt(document.getElementById('newCode').value.trim());
-  let users=JSON.parse(localStorage.getItem('users')||"[]");
 
-  if(!/^[\u0600-\u06FF\s]+$/.test(name) || name.split(' ').length<3){
-    alert("⚠️ أدخل الاسم الثلاثي بحروف عربية فقط"); return;
-  }
-  if(!/^0\d{10}$/.test(phone)){ alert("⚠️ أدخل رقم موبايل صحيح يبدأ بـ0 ويتكون من 11 رقم"); return; }
-  if(isNaN(code)||code<2006||code>9998){ alert("⚠️ الكود خارج النطاق"); return; }
-  if(users.find(u=>u.code===code)){ alert("⚠️ الكود مستخدم"); return; }
-  if(users.find(u=>u.phone===phone)){ alert("⚠️ رقم الموبايل مستخدم"); return; }
-  if(users.find(u=>u.name===name)){ alert("⚠️ الاسم مستخدم"); return; }
+  let nameOk=/^[\u0600-\u06FF ]{7,}$/.test(name); // اسم عربي ثلاثي على الأقل 7 حروف مع مسافة
+  let phoneOk=/^0\d{10}$/.test(phone);
+  let codeOk=code>=2001 && code<=9999;
 
-  users.push({name, phone, code});
+  if(!nameOk){ alert("❗ الاسم يجب أن يكون ثلاثي وبحروف عربية فقط."); return;}
+  if(!phoneOk){ alert("❗ رقم الهاتف يجب أن يبدأ بـ 0 ويتكون من 11 رقم."); return;}
+  if(!codeOk){ alert("❗ الكود يجب أن يكون بين 2001 و 9999."); return;}
+  if(users.find(u=>u.phone===phone)){ alert("⚠️ هذا الرقم مسجل بالفعل."); return;}
+  if(users.find(u=>u.code===code)){ alert("⚠️ هذا الكود مستخدم بالفعل."); return;}
+
+  let user={name, phone, code, role:"user"};
+  users.push(user);
   localStorage.setItem('users', JSON.stringify(users));
-  alert("✅ تم التسجيل بنجاح! يمكنك الدخول الآن");
+  localStorage.setItem('loggedUser', JSON.stringify(user));
+  alert("✅ تم التسجيل بنجاح.");
+  location.href="myPurchases.html";
 }
 
-// تسجيل الدخول
-function loginUser(){
-  let phone=document.getElementById('phone').value.trim();
-  let code=parseInt(document.getElementById('code').value.trim());
-  if(!phone||isNaN(code)){ alert("⚠️ أدخل رقم الموبايل والكود"); return; }
+function login(){
+  let phone=document.getElementById('loginPhone').value.trim();
+  let code=parseInt(document.getElementById('loginCode').value.trim());
+  let user=users.find(u=>u.phone===phone && u.code===code);
 
-  let superAdmin=JSON.parse(localStorage.getItem('superAdmin'));
-  let admins=JSON.parse(localStorage.getItem('admins')||"[]");
-  let users=JSON.parse(localStorage.getItem('users')||"[]");
-
-  if(phone===superAdmin.phone && code===superAdmin.code){
-    localStorage.setItem('loggedUser', JSON.stringify({role:"super", phone, code}));
-    location.href="admin.html";
-  }
-  else if(admins.find(a=>a.phone===phone && a.code===code)){
-    localStorage.setItem('loggedUser', JSON.stringify({role:"admin", phone, code}));
-    location.href="admin.html";
-  }
-  else if(users.find(u=>u.phone===phone && u.code===code)){
-    localStorage.setItem('loggedUser', JSON.stringify({role:"user", phone, code}));
-    location.href="myPurchases.html";
-  }
-  else{
-    alert("⚠️ بيانات غير صحيحة أو مستخدم غير مسجل");
+  if(user){
+    localStorage.setItem('loggedUser', JSON.stringify(user));
+    alert("✅ تم تسجيل الدخول بنجاح.");
+    if(user.role==="superadmin" || user.role==="admin") location.href="admin.html";
+    else location.href="myPurchases.html";
+  }else{
+    alert("❌ بيانات الدخول غير صحيحة.");
   }
 }
 
-// منع ظهور صفحة التسجيل لو الجلسة نشطة
-if(localStorage.getItem('loggedUser')){
-  let u=JSON.parse(localStorage.getItem('loggedUser'));
-  if(u.role==="super"||u.role==="admin") location.href="admin.html";
-  else if(u.role==="user") location.href="myPurchases.html";
+function logout(){
+  localStorage.removeItem('loggedUser');
+  location.reload();
 }
+
+renderForms();
 </script>
 
 </body>
