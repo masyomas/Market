@@ -10,9 +10,15 @@ header { background:#6c757d; color:#fff; padding:12px; font-size:22px;}
 nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd; border-bottom:1px solid #ddd; }
 nav a { text-decoration:none; color:#333; font-size:14px;}
 nav a:hover { color:#007bff; }
-section { margin:10px auto; width:95%; max-width:700px;}
-.item { border:1px solid #ddd; border-radius:6px; margin:5px 0; padding:8px; text-align:right; }
+section { margin:10px auto; width:95%; max-width:800px;}
+.top-info { margin:10px 0; font-size:16px; font-weight:bold; }
+.sub-info { display:flex; justify-content:space-between; font-size:14px; color:#333; margin-bottom:10px; }
+.item { border:1px solid #ddd; border-radius:6px; margin:5px 0; padding:8px; text-align:right;}
 .item img { width:80px; height:80px; object-fit:cover; border-radius:4px; float:right; margin-left:8px;}
+.item-details { overflow:hidden; }
+button.cancelBtn { background:#dc3545; color:#fff; border:none; padding:4px 8px; font-size:13px; border-radius:4px; cursor:pointer; margin-top:4px;}
+button.cancelBtn:hover { background:#c82333;}
+.total { font-size:15px; font-weight:bold; margin-top:10px; }
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px; clear:both;}
 .clearfix::after {content:""; clear:both; display:table;}
 </style>
@@ -27,46 +33,85 @@ footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; col
   <a href="register.html">🔑 حسابي</a>
 </nav>
 
-<section id="purchasesContainer"></section>
+<section>
+  <div class="top-info" id="userName">👤 اسم المستخدم</div>
+  <div class="sub-info">
+    <span id="userCode">🧾 الكود: </span>
+    <span id="userBonus">🎁 البونص: </span>
+  </div>
+  <div id="purchasesContainer"></div>
+  <div class="total" id="totalPaid">💰 الإجمالي: 0 جنيه</div>
+</section>
 
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-// التحقق من تسجيل الدخول
+// جلب بيانات المستخدم
 let logged=JSON.parse(localStorage.getItem('loggedUser'));
+let users=JSON.parse(localStorage.getItem('users')||"[]");
+let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
+let bonusPercent=parseFloat(localStorage.getItem('bonusPercent'))||1;
+
 if(!logged || logged.role!=="user") {
   alert("⚠️ يجب تسجيل الدخول أولاً.");
   location.href="register.html";
 }
 
-// جلب المشتريات
-let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
-let userPurchases=purchases.filter(p=>p.phone===logged.phone);
+// بيانات المستخدم
+let user=users.find(u=>u.phone===logged.phone && u.code===logged.code);
+if(user){
+  let userPurchases=purchases.filter(p=>p.phone===user.phone);
+  let totalPaid=0; userPurchases.forEach(p=> totalPaid+=parseFloat(p.price)||0);
+  let bonus=Math.round((totalPaid*bonusPercent)/100);
 
-// تجميع نفس السلعة معًا
-let grouped={};
-userPurchases.forEach(p=>{
-  let key=p.name;
-  if(grouped[key]){
-    grouped[key].count+=1;
-  }else{
-    grouped[key]={...p,count:1};
+  document.getElementById("userName").textContent= `👤 ${user.name}`;
+  document.getElementById("userCode").textContent= `🧾 الكود: ${user.code}`;
+  document.getElementById("userBonus").textContent= `🎁 البونص: ${bonus} جنيه`;
+  document.getElementById("totalPaid").textContent= `💰 الإجمالي: ${totalPaid} جنيه`;
+
+  // تجميع نفس السلعة مع كل عمليات الشراء الخاصة بها
+  let grouped={};
+  userPurchases.forEach((p,i)=>{
+    let key=p.name;
+    if(!grouped[key]) grouped[key]=[];
+    grouped[key].push({...p, index:i});
+  });
+
+  let html="";
+  for(let key in grouped){
+    let items=grouped[key];
+    let p=items[0];
+    let count=items.length;
+    let lastTime = new Date(p.timestamp).toLocaleString('ar-EG');
+    let canCancel = (Date.now()-p.timestamp)<21600000; // أقل من 6 ساعات
+
+    html+=`
+    <div class="item clearfix">
+      <img src="${p.image}" alt="${p.name}">
+      <div class="item-details">
+        <div><b>${p.name}</b></div>
+        <div>✅ تم شراء: ${count} مرة</div>
+        <div>📅 آخر شراء: ${lastTime}</div>
+        <div>💰 السعر: ${p.price} جنيه</div>
+        ${canCancel ? `<button class="cancelBtn" onclick="cancelPurchase('${p.timestamp}')">إلغاء الشراء</button>`:""}
+      </div>
+    </div>`;
   }
-});
 
-// توليد HTML
-let html="";
-for(let key in grouped){
-  let p=grouped[key];
-  html+=`
-  <div class="item clearfix">
-    <img src="${p.image}" alt="${p.name}">
-    <div><b>${p.name}</b> - السعر: ${p.price} جنيه</div>
-    <div>✅ تم شراء: ${p.count} مرة</div>
-  </div>`;
+  document.getElementById('purchasesContainer').innerHTML=html || "📦 لم يتم شراء منتجات بعد.";
+}else{
+  alert("⚠️ بيانات المستخدم غير صحيحة.");
+  location.href="register.html";
 }
 
-document.getElementById('purchasesContainer').innerHTML=html || "📦 لم يتم شراء منتجات بعد.";
+// دالة إلغاء الشراء
+function cancelPurchase(timestamp){
+  let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
+  purchases=purchases.filter(p=>p.timestamp!=timestamp);
+  localStorage.setItem('purchases', JSON.stringify(purchases));
+  alert("✅ تم إلغاء الشراء بنجاح.");
+  location.reload();
+}
 </script>
 
 </body>
