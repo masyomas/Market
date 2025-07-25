@@ -3,59 +3,68 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📋 مطابقة الفاتورة</title>
+<title>🧾 مطابقة الفاتورة</title>
 <style>
-body { font-family:'Tahoma',sans-serif; margin:20px; background:#f9f9f9; }
-h3 { color:#007bff; }
-select, textarea, button { width:100%; margin:10px 0; padding:6px; border-radius:4px; border:1px solid #ccc; }
-button { background:#28a745; color:#fff; cursor:pointer; }
-button:hover { background:#218838; }
+  body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; text-align:center; }
+  header { background:#007bff; color:#fff; padding:12px; font-size:20px; }
+  section { margin:20px auto; width:90%; max-width:600px; }
+  select, button, textarea { width:90%; padding:8px; margin:8px 0; font-size:15px; border:1px solid #ccc; border-radius:4px; }
+  button { background:#28a745; color:#fff; cursor:pointer; }
+  button:hover { background:#218838; }
+  footer { background:#f1f1f1; padding:8px; font-size:13px; color:#777; margin-top:10px; }
 </style>
 </head>
 <body>
 
-<h3>📋 مطابقة الفاتورة</h3>
+<header>🧾 مطابقة الفاتورة</header>
 
-<label for="clientSelect">اختر كود العميل:</label>
-<select id="clientSelect" onchange="showProducts()">
-  <option value="">-- اختر كود العميل --</option>
-</select>
+<section>
+  <label for="clientCode">اختر كود العميل:</label>
+  <select id="clientCode">
+    <option value="">-- اختر --</option>
+  </select>
 
-<label for="productsBox">جميع السلع التي اشتراها العميل:</label>
-<textarea id="productsBox" rows="6" readonly></textarea>
+  <button onclick="matchInvoice()">📋 مطابقة الفاتورة</button>
 
-<button onclick="matchInvoice()">🧾 مطابقة الفاتورة</button>
+  <textarea id="invoiceBox" rows="8" readonly placeholder="ستظهر هنا أسماء السلع المشتراة..."></textarea>
+</section>
+
+<footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-// جلب المستخدمين والمشتريات من localStorage
-let users = JSON.parse(localStorage.getItem('users') || "[]");
-let purchases = JSON.parse(localStorage.getItem('purchases') || "[]");
+  // تحميل الأكواد من المستخدمين المسجلين
+  let users = JSON.parse(localStorage.getItem('users') || '[]');
+  let purchases = JSON.parse(localStorage.getItem('purchases') || '[]');
 
-// تعبئة القائمة المنسدلة بأكواد العملاء
-let select = document.getElementById('clientSelect');
-users.forEach(u=>{
-  if(u.role=="user"){
-    let opt = document.createElement('option');
-    opt.value = u.code;
-    opt.text = `${u.name} - كود: ${u.code}`;
-    select.appendChild(opt);
+  let select = document.getElementById('clientCode');
+
+  users.forEach(u => {
+    if(u.code) {
+      let opt = document.createElement('option');
+      opt.value = u.code;
+      opt.text = `${u.name} - كود: ${u.code}`;
+      select.appendChild(opt);
+    }
+  });
+
+  function matchInvoice(){
+    let code = document.getElementById('clientCode').value;
+    if(!code){ alert('⚠️ اختر كود العميل أولاً'); return; }
+
+    let userPurchases = purchases.filter(p => p.code == code);
+    if(userPurchases.length == 0){
+      document.getElementById('invoiceBox').value = "📦 لا توجد مشتريات لهذا العميل.";
+      return;
+    }
+
+    // تجميع أسماء السلع (مع الكمية لو موجودة)
+    let result = "";
+    userPurchases.forEach(p => {
+      result += `• ${p.product} × ${p.qty} بسعر ${p.price} جنيه\n`;
+    });
+
+    document.getElementById('invoiceBox').value = result;
   }
-});
-
-// عند اختيار كود عميل نعرض سلع مشترياته
-function showProducts(){
-  let code = document.getElementById('clientSelect').value;
-  if(!code) { document.getElementById('productsBox').value=""; return; }
-
-  let userPurchases = purchases.filter(p=>p.code==code);
-  let productsList = userPurchases.map(p=>p.product).join('\n');
-  document.getElementById('productsBox').value = productsList || "لا توجد مشتريات.";
-}
-
-// عند الضغط على زر مطابقة الفاتورة
-function matchInvoice(){
-  alert("📄 تم الضغط على زر مطابقة الفاتورة!\nيمكنك هنا برمجة ما تريد تنفيذه.");
-}
 </script>
 
 </body>
