@@ -3,234 +3,164 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🛠️ لوحة الإدارة</title>
+<title>🛠️ لوحة الإدارة بصلاحيات مرنة</title>
 <style>
 body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff;}
 header { background:#6c757d; color:#fff; padding:12px; font-size:20px; text-align:center;}
 nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px; border-top:1px solid #ddd; border-bottom:1px solid #ddd;}
 nav a { text-decoration:none; color:#333; font-size:14px;}
 nav a:hover { color:#007bff;}
-section { margin:10px auto; width:95%; max-width:750px;}
+section { margin:10px auto; width:95%; max-width:800px;}
 h3 { background:#007bff; color:#fff; padding:6px; border-radius:4px; font-size:17px;}
-input[type=text], input[type=number], select { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
-button { background:#28a745; color:#fff; padding:6px 10px; border:none; border-radius:4px; cursor:pointer; margin:4px 0;}
-button:hover { background:#218838;}
-.logoutBtn { background:#dc3545; }
-.logoutBtn:hover { background:#c82333;}
 table { width:100%; border-collapse:collapse; margin-top:8px;}
 td, th { border:1px solid #ccc; padding:4px; font-size:13px;}
+button { background:#28a745; color:#fff; padding:6px 10px; border:none; border-radius:4px; cursor:pointer; margin:4px 0;}
+button:hover { background:#218838;}
+.delBtn { background:#dc3545; }
+.delBtn:hover { background:#c82333;}
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px;}
+input[type=text], input[type=password] { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
+label { display:block; font-size:13px; margin-top:4px;}
 </style>
 </head>
 <body>
 
-<header>🛠️ لوحة الإدارة</header>
+<header>🛠️ لوحة الإدارة بصلاحيات مرنة</header>
 
 <nav>
   <a href="index.html">🏠 المتجر</a>
-  <a href="myPurchases.html">📊 مبيعاتي</a>
+  <a href="myPurchases.html">🛒 مشترياتي</a>
   <a href="register.html">🔑 حسابي</a>
 </nav>
 
-<section id="adminSection">
-  <!-- سيتم تعبئة المحتوى تلقائيًا -->
-</section>
+<section id="adminContent">⏳ جاري التحميل...</section>
 
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-let logged=JSON.parse(localStorage.getItem('loggedUser'));
-let users=JSON.parse(localStorage.getItem('users')||"[]");
-let products=JSON.parse(localStorage.getItem('products')||"[]");
-let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
+let logged = JSON.parse(localStorage.getItem('loggedUser'));
+let users = JSON.parse(localStorage.getItem('users') || "[]");
+let purchases = JSON.parse(localStorage.getItem('purchases') || "[]");
 
 function renderAdmin(){
-  if(!logged || logged.role!=="superadmin"){
-    document.getElementById('adminSection').innerHTML='<p>🚫 لا تملك صلاحية الدخول هنا.</p>';
+  if(!logged || (logged.role !== "superadmin" && logged.role !== "admin")){
+    document.getElementById('adminContent').innerHTML = '<p>🚫 لا تملك صلاحية الدخول هنا.</p>';
     return;
   }
 
-  // احصائيات
-  let activeUser = logged; // المسجل دخوله حاليًا
-  let totalUsers = users.filter(u=>u.role=="user").length;
-  let usersWithPurchases = users.filter(u => 
-    u.role=="user" && purchases.some(p=>p.code==u.code)
-  ).length;
-  let usersWithoutPurchases = users.filter(u => 
-    u.role=="user" && !purchases.some(p=>p.code==u.code)
-  );
+  let html = `<h3>مرحبًا ${logged.name} (${logged.role})</h3>
+  <div>📞 هاتفك: ${logged.phone} | 🆔 كودك: ${logged.code}</div>
+  <button onclick="logout()">🚪 تسجيل خروج</button>`;
 
-  let html=`
-  <h3>👋 مرحبًا ${logged.name}</h3>
-  <button class="logoutBtn" onclick="logout()">تسجيل خروج</button>
+  // فقط سوبر أدمن يضيف مدراء مع صلاحيات
+  if(logged.role=="superadmin"){
+    html += `<h3>➕ إضافة مدير جديد مع صلاحيات</h3>
+    <input type="text" id="adminName" placeholder="اسم المدير">
+    <input type="text" id="adminPhone" placeholder="رقم الهاتف">
+    <input type="password" id="adminPass" placeholder="كلمة المرور">
+    <label><input type="checkbox" id="permViewUsers"> مشاهدة المستخدمين</label>
+    <label><input type="checkbox" id="permAddUsers"> إضافة مستخدمين</label>
+    <label><input type="checkbox" id="permDeleteUsers"> حذف مستخدمين</label>
+    <label><input type="checkbox" id="permViewSales"> مشاهدة المبيعات</label>
+    <label><input type="checkbox" id="permDeleteSales"> حذف المبيعات</label>
+    <button onclick="addAdmin()">إضافة مدير</button>`;
+  }
 
-  <h3>📊 ملخص سريع</h3>
-  <div>✅ المستخدم النشط حاليًا: ${activeUser.name} (${activeUser.role})</div>
-  <div>👥 إجمالي المستخدمين المسجلين: ${totalUsers}</div>
-  <div>🛒 المستخدمين الذين اشتروا مرة واحدة على الأقل: ${usersWithPurchases}</div>
-  <div>📦 المستخدمين المسجلين بدون شراء: ${usersWithoutPurchases.length}</div>
-  
-  <h3>👥 جميع المستخدمين</h3>`;
-  if(users.length){
-    html+=`<table>
-    <tr><th>الاسم</th><th>الدور</th><th>الهاتف</th><th>الكود</th></tr>`;
+  // جدول المستخدمين
+  if(logged.role=="superadmin" || (logged.permissions && logged.permissions.canViewUsers)){
+    html += `<h3>👥 جميع المستخدمين</h3>`;
+    html += `<table>
+    <tr><th>الاسم</th><th>الهاتف</th><th>الكود</th><th>الدور</th></tr>`;
     users.forEach(u=>{
-      html+=`<tr>
-      <td>${u.name}</td>
-      <td>${u.role}</td>
-      <td>${u.phone}</td>
-      <td>${u.code}</td></tr>`;
+      html += `<tr>
+        <td>${u.name}</td>
+        <td>${u.phone}</td>
+        <td>${u.code}</td>
+        <td>${u.role}</td>
+      </tr>`;
     });
-    html+=`</table>`;
-  }else{ html+=`<p>⚠️ لا يوجد مستخدمون.</p>`; }
-
-  html+=`<h3>📝 المستخدمين المسجلين بدون شراء</h3>`;
-  if(usersWithoutPurchases.length){
-    html+=`<table>
-    <tr><th>الاسم</th><th>رقم الهاتف</th><th>الكود</th></tr>`;
-    usersWithoutPurchases.forEach(u=>{
-      html+=`<tr>
-      <td>${u.name}</td>
-      <td>${u.phone}</td>
-      <td>${u.code}</td></tr>`;
-    });
-    html+=`</table>`;
-  }else{
-    html+=`<p>✔️ جميع المستخدمين قاموا بعملية شراء واحدة على الأقل.</p>`;
+    html += `</table>`;
   }
 
-  html+=`<h3>📦 سجل المبيعات</h3>`;
-  if(purchases.length){
-    html+=`<table>
-    <tr><th>السلعة</th><th>العميل</th><th>الكود</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th><th>التاريخ</th></tr>`;
-    purchases.forEach(p=>{
-      let subtotal = p.qty * p.price;
-      html+=`<tr>
-      <td>${p.product}</td>
-      <td>${p.name||'غير معرف'}</td>
-      <td>${p.code}</td>
-      <td>${p.qty}</td>
-      <td>${p.price}</td>
-      <td>${subtotal}</td>
-      <td>${p.timestamp||'—'}</td></tr>`;
-    });
-    html+=`</table>
-    <button onclick="clearAll()">🧹 مسح كل المبيعات</button>`;
-  }else{
-    html+=`<p>📭 لا توجد مبيعات بعد.</p>`;
+  // فقط سوبر أدمن أو مدير عنده تصريح canDeleteUsers
+  if(logged.role=="superadmin" || (logged.permissions && logged.permissions.canDeleteUsers)){
+    html += `<button class="delBtn" onclick="clearUsers()">🧹 مسح كل المستخدمين عدا سوبر أدمن</button>`;
   }
 
-  html+=`<h3>➕ إضافة سلعة جديدة</h3>
-  <input type="text" id="pName" placeholder="اسم السلعة">
-  <input type="number" id="pPrice" placeholder="سعر السلعة">
-  <input type="text" id="pDetails" placeholder="تفاصيل السلعة">
-  <input type="file" id="pImg">
-  <button onclick="addProduct()">إضافة</button>`;
-
-  if(products.length){
-    html+=`<h3>📦 السلع المضافة</h3>
-    <table>
-    <tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>تفاصيل</th><th>حذف</th></tr>`;
-    products.forEach((p,i)=>{
-      html+=`<tr>
-      <td><img src="${p.img||'https://via.placeholder.com/50'}" width="50"></td>
-      <td>${p.name}</td>
-      <td>${p.price}</td>
-      <td>${p.details}</td>
-      <td><button onclick="delProduct(${i})">🗑️</button></td></tr>`;
-    });
-    html+=`</table>`;
+  // جدول المبيعات
+  if(logged.role=="superadmin" || (logged.permissions && logged.permissions.canViewSales)){
+    html += `<h3>💰 جميع المبيعات</h3>`;
+    if(purchases.length){
+      html += `<table>
+      <tr><th>المنتج</th><th>الكود</th><th>الهاتف</th><th>الكمية</th><th>سعر</th><th>الإجمالي</th><th>التاريخ</th></tr>`;
+      purchases.forEach(p=>{
+        html += `<tr>
+          <td>${p.product}</td>
+          <td>${p.code}</td>
+          <td>${p.phone}</td>
+          <td>${p.qty}</td>
+          <td>${p.price}</td>
+          <td>${p.qty*p.price}</td>
+          <td>${p.timestamp||"—"}</td>
+        </tr>`;
+      });
+      html += `</table>`;
+    }else{
+      html += `<p>📦 لا توجد مبيعات بعد.</p>`;
+    }
   }
 
-  html+=`<h3>🧾 إصدار فاتورة</h3>
-  <select id="invoiceSelect"><option value="">اختر كود العميل</option>`;
-  users.filter(u=>u.role=="user").forEach(u=>{
-    html+=`<option value="${u.code}">${u.name} - كود:${u.code}</option>`;
-  });
-  html+=`</select>
-  <button onclick="showInvoice()">عرض الفاتورة</button>
-  <div id="invoiceDetails"></div>`;
+  if(logged.role=="superadmin" || (logged.permissions && logged.permissions.canDeleteSales)){
+    html += `<button class="delBtn" onclick="clearPurchases()">🧹 مسح كل المبيعات</button>`;
+  }
 
-  document.getElementById('adminSection').innerHTML=html;
+  document.getElementById('adminContent').innerHTML = html;
 }
 
-function addProduct(){
-  let name=document.getElementById('pName').value.trim();
-  let price=parseFloat(document.getElementById('pPrice').value);
-  let details=document.getElementById('pDetails').value.trim();
-  let imgInput=document.getElementById('pImg');
-  if(!name||!price||!details){ alert("❗ أكمل جميع البيانات."); return;}
-  if(imgInput.files.length){
-    let reader=new FileReader();
-    reader.onload=function(e){
-      products.push({name,price,details,img:e.target.result});
-      localStorage.setItem('products', JSON.stringify(products));
-      renderAdmin();
-    };
-    reader.readAsDataURL(imgInput.files[0]);
-  }else{
-    products.push({name,price,details,img:""});
-    localStorage.setItem('products', JSON.stringify(products));
-    renderAdmin();
-  }
-}
+// إضافة مدير جديد مع صلاحيات
+function addAdmin(){
+  let name = document.getElementById('adminName').value.trim();
+  let phone = document.getElementById('adminPhone').value.trim();
+  let pass = document.getElementById('adminPass').value.trim();
+  let code = Math.floor(2001 + Math.random()*7999);
 
-function delProduct(i){
-  if(confirm("⚠️ حذف السلعة؟")){
-    products.splice(i,1);
-    localStorage.setItem('products', JSON.stringify(products));
-    renderAdmin();
-  }
-}
+  let permissions = {
+    canViewUsers: document.getElementById('permViewUsers').checked,
+    canAddUsers: document.getElementById('permAddUsers').checked,
+    canDeleteUsers: document.getElementById('permDeleteUsers').checked,
+    canViewSales: document.getElementById('permViewSales').checked,
+    canDeleteSales: document.getElementById('permDeleteSales').checked
+  };
 
-function clearAll(){
-  let pass=prompt("🔒 أدخل كلمة مرور السوبر أدمن لمسح البيانات:");
-  if(pass===logged.code.toString()){
-    localStorage.removeItem('purchases');
-    purchases=[];
-    alert("✅ تم مسح كل المبيعات.");
-    renderAdmin();
-  }else{
-    alert("❌ كلمة مرور خاطئة.");
-  }
-}
+  if(!name || !phone || !pass){ alert("❗ أدخل كل البيانات."); return; }
+  if(users.find(u=>u.phone===phone)){ alert("⚠️ رقم الهاتف مستخدم بالفعل."); return; }
 
-function showInvoice(){
-  let code=document.getElementById('invoiceSelect').value;
-  if(!code) return;
-  let u=users.find(u=>u.code==code);
-  if(!u) return;
-
-  let userPurchases=purchases.filter(p=>p.code==code);
-  let grouped=[];
-  userPurchases.forEach(p=>{
-    let exist=grouped.find(g=>g.product==p.product && g.price==p.price);
-    if(exist){ exist.qty+=p.qty; }
-    else{ grouped.push({product:p.product, qty:p.qty, price:p.price}); }
-  });
-
-  let html=`<div style="margin-top:10px;">
-  <div>👤 الاسم: ${u.name}</div>
-  <div>📞 الهاتف: ${u.phone}</div>
-  <div>🧾 الكود: ${u.code}</div>
-  <div>📅 التاريخ: ${new Date().toLocaleString('ar-EG')}</div>
-  <table>
-  <tr><th>السلعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr>`;
-  let total=0;
-  grouped.forEach(item=>{
-    let subtotal=item.qty*item.price;
-    total+=subtotal;
-    html+=`<tr><td>${item.product}</td><td>${item.qty}</td><td>${item.price}</td><td>${subtotal}</td></tr>`;
-  });
-  html+=`<tr><td colspan="3">💰 الإجمالي</td><td>${total}</td></tr></table>
-  <button onclick="window.print()">🖨️ طباعة الفاتورة</button>
-  </div>`;
-  document.getElementById('invoiceDetails').innerHTML=html;
+  users.push({ name, phone, password:pass, code, role:"admin", permissions });
+  localStorage.setItem('users', JSON.stringify(users));
+  alert(`✅ تمت إضافة المدير بكود: ${code}`);
+  renderAdmin();
 }
 
 function logout(){
   localStorage.removeItem('loggedUser');
-  location.href='register.html';
+  location.href = "register.html";
+}
+
+function clearUsers(){
+  if(confirm("⚠️ هل أنت متأكد؟")){
+    let superAdmin = users.find(u=>u.role=="superadmin");
+    localStorage.setItem('users', JSON.stringify([superAdmin]));
+    alert("✅ تم مسح كل المستخدمين الآخرين.");
+    location.reload();
+  }
+}
+
+function clearPurchases(){
+  if(confirm("⚠️ هل أنت متأكد؟")){
+    localStorage.removeItem('purchases');
+    alert("✅ تم مسح كل المبيعات.");
+    location.reload();
+  }
 }
 
 renderAdmin();
