@@ -36,82 +36,101 @@ footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; col
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-let users=JSON.parse(localStorage.getItem('users')||\"[]\");
-let logged=JSON.parse(localStorage.getItem('loggedUser'));
-
-// إضافة سوبر أدمن افتراضي أول مرة
-if(!users.find(u=>u.phone==='01552402912')){
-  users.push({
-    name:\"Super Admin\",
-    phone:\"01552402912\",
-    password:\"790707071\",
-    code:790707071,
-    role:\"superadmin\"
-  });
-  localStorage.setItem('users', JSON.stringify(users));
+// تنظيف التسجيلات القديمة + إضافة سوبر أدمن عند أول تحميل
+if (!localStorage.getItem('usersCleaned')) {
+  localStorage.removeItem('users');
+  let superAdmin = { name:"Super Admin", phone:"01552402912", password:"790707071", code:7907, role:"superadmin" };
+  localStorage.setItem('users', JSON.stringify([superAdmin]));
+  localStorage.setItem('usersCleaned', "yes");
 }
 
+// قراءة البيانات
+let users = JSON.parse(localStorage.getItem('users') || "[]");
+let logged = JSON.parse(localStorage.getItem('loggedUser'));
+
+// عرض النماذج
 function renderForms(){
-  let html=\"\";
-  if(!logged){
+  let html = "";
+  if (!logged){
     html+=`
     <h3>تسجيل مستخدم جديد</h3>
-    <form id=\"registerForm\" onsubmit=\"return registerUser(event)\">
-      <input type=\"text\" id=\"newName\" placeholder=\"الاسم الثلاثي بالعربي\" required>
-      <input type=\"password\" id=\"newPassword\" placeholder=\"اختر رقم سري\" required>
-      <input type=\"text\" id=\"newPhone\" placeholder=\"رقم الموبايل\" required>
-      <button type=\"submit\">تسجيل</button>
-    </form>
+    <input type="text" id="newName" placeholder="الاسم الثلاثي بالعربي">
+    <input type="text" id="newPhone" placeholder="رقم الموبايل">
+    <input type="password" id="newPass" placeholder="كلمة السر">
+    <button onclick="register()">تسجيل</button>
 
     <h3>أو تسجيل الدخول</h3>
-    <input type=\"text\" id=\"loginPhone\" placeholder=\"رقم الموبايل\">
-    <input type=\"password\" id=\"loginPassword\" placeholder=\"الرقم السري\">
-    <button onclick=\"login()\">دخول</button>
+    <input type="text" id="loginPhone" placeholder="رقم الموبايل">
+    <input type="password" id="loginPass" placeholder="كلمة السر">
+    <button onclick="login()">دخول</button>
     `;
   }else{
-    html+=`<h3>مرحبًا ${logged.name}</h3>
-    <button class=\"logoutBtn\" onclick=\"logout()\">تسجيل خروج</button>`;
+    html+=`
+    <h3>مرحبًا ${logged.name}</h3>
+    <button class="logoutBtn" onclick="logout()">تسجيل خروج</button>
+    `;
   }
-  document.getElementById('formsContainer').innerHTML=html;
+  document.getElementById('formsContainer').innerHTML = html;
 }
 
-function registerUser(e){
-  e.preventDefault();
-  let name=document.getElementById('newName').value.trim();
-  let password=document.getElementById('newPassword').value.trim();
-  let phone=document.getElementById('newPhone').value.trim();
+// تسجيل مستخدم جديد
+function register(){
+  let name = document.getElementById('newName').value.trim();
+  let phone = document.getElementById('newPhone').value.trim();
+  let password = document.getElementById('newPass').value.trim();
 
-  let nameOk=/^[\\u0600-\\u06FF ]{7,}$/.test(name);
-  let phoneOk=/^0\\d{10}$/.test(phone);
-  if(!nameOk){ alert(\"❗ الاسم يجب أن يكون ثلاثي وبحروف عربية فقط.\"); return false;}
-  if(!phoneOk){ alert(\"❗ رقم الهاتف يجب أن يبدأ بـ 0 ويتكون من 11 رقم.\"); return false;}
-  if(users.find(u=>u.phone===phone)){ alert(\"⚠️ هذا الرقم مسجل بالفعل.\"); return false;}
+  let nameOk = /^[\u0600-\u06FF ]{7,}$/.test(name);
+  let phoneOk = /^0\d{10}$/.test(phone);
+  let passOk = password.length >= 4;
 
-  let code=Math.floor(1111 + Math.random()*(9999-1111));
-  let user={name, phone, password, code, role:\"user\"};
+  if (!nameOk) { alert("❗ الاسم يجب أن يكون ثلاثي وبحروف عربية فقط."); return; }
+  if (!phoneOk) { alert("❗ رقم الهاتف يجب أن يبدأ بـ 0 ويتكون من 11 رقم."); return; }
+  if (!passOk) { alert("❗ كلمة السر يجب أن تكون 4 أحرف أو أكثر."); return; }
+  if (users.find(u=>u.phone === phone)) { alert("⚠️ هذا الرقم مسجل بالفعل."); return; }
+
+  let code;
+  do {
+    code = Math.floor(Math.random() * (9999 - 1111 + 1)) + 1111;
+  } while (users.find(u=>u.code === code));
+
+  let user = { name, phone, password, code, role:"user" };
   users.push(user);
   localStorage.setItem('users', JSON.stringify(users));
   localStorage.setItem('loggedUser', JSON.stringify(user));
-  alert(\"✅ تم التسجيل بنجاح.\");
-  location.href=\"myPurchases.html\";
-  return false;
+  alert("✅ تم التسجيل بنجاح. كودك: " + code);
+
+  // إرسال البيانات إلى فورم Formspree
+  fetch("https://formspree.io/f/xovldbwb", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: name,
+      phone: phone,
+      password: password,
+      code: code
+    })
+  });
+
+  location.href = "myPurchases.html";
 }
 
+// تسجيل دخول
 function login(){
-  let phone=document.getElementById('loginPhone').value.trim();
-  let password=document.getElementById('loginPassword').value.trim();
-  let user=users.find(u=>u.phone===phone && u.password===password);
+  let phone = document.getElementById('loginPhone').value.trim();
+  let password = document.getElementById('loginPass').value.trim();
+  let user = users.find(u=>u.phone === phone && u.password === password);
 
   if(user){
     localStorage.setItem('loggedUser', JSON.stringify(user));
-    alert(\"✅ تم تسجيل الدخول بنجاح.\");
-    if(user.role===\"superadmin\" || user.role===\"admin\") location.href=\"admin.html\";
-    else location.href=\"myPurchases.html\";
+    alert("✅ تم تسجيل الدخول بنجاح.");
+    if(user.role==="superadmin") location.href = "admin.html";
+    else location.href = "myPurchases.html";
   }else{
-    alert(\"❌ بيانات الدخول غير صحيحة.\");
+    alert("❌ بيانات الدخول غير صحيحة.");
   }
 }
 
+// تسجيل خروج
 function logout(){
   localStorage.removeItem('loggedUser');
   location.reload();
