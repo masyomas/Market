@@ -16,8 +16,9 @@ section { margin:10px auto; width:95%; max-width:800px;}
 .item { border:1px solid #ddd; border-radius:6px; margin:5px 0; padding:8px; text-align:right;}
 .item img { width:80px; height:80px; object-fit:cover; border-radius:4px; float:right; margin-left:8px;}
 .item-details { overflow:hidden; }
-button.cancelBtn { background:#dc3545; color:#fff; border:none; padding:4px 8px; font-size:13px; border-radius:4px; cursor:pointer; margin-top:4px;}
-button.cancelBtn:hover { background:#c82333;}
+.cancelBtn { background:#dc3545; color:#fff; border:none; padding:4px 8px; font-size:13px; border-radius:4px; cursor:pointer; margin-top:4px;}
+.cancelBtn:hover { background:#c82333;}
+.time-left { font-size:12px; color:#555; margin-top:2px;}
 .total { font-size:15px; font-weight:bold; margin-top:10px; }
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px; clear:both;}
 .clearfix::after {content:""; clear:both; display:table;}
@@ -66,6 +67,8 @@ async function loadAndRender(){
     userPurchases.forEach((p)=>{
       let prod=products.find(prod=>prod.name===p.product); // جلب بيانات السلعة
       let lastTime=new Date(p.timestamp).toLocaleString('ar-EG');
+      let canCancel=(Date.now()-p.timestamp)<21600000; // 6 ساعات
+      let timeLeft=canCancel ? formatTimeLeft(21600000 - (Date.now()-p.timestamp)) : null;
       totalPaid+=p.price*p.qty;
 
       html+=`
@@ -75,6 +78,8 @@ async function loadAndRender(){
           <div><b>${prod?.name || p.product}</b></div>
           <div>📅 التاريخ: ${lastTime}</div>
           <div>💰 السعر: ${p.price} × ${p.qty} = ${p.price*p.qty} جنيه</div>
+          ${canCancel ? `<div class="time-left">⏰ متبقي للإلغاء: ${timeLeft}</div>
+          <button class="cancelBtn" onclick="cancelPurchase('${p.timestamp}')">إلغاء الشراء</button>` : ""}
         </div>
       </div>`;
     });
@@ -83,6 +88,21 @@ async function loadAndRender(){
     document.getElementById("totalPaid").textContent= `💰 الإجمالي: ${totalPaid} جنيه`;
   }catch(e){
     document.getElementById('purchasesContainer').innerHTML="⚠️ تعذر تحميل السلع.";
+  }
+}
+
+function formatTimeLeft(ms){
+  let minutes=Math.floor(ms/60000);
+  let seconds=Math.floor((ms%60000)/1000);
+  return `${minutes} دقيقة و ${seconds} ثانية`;
+}
+
+function cancelPurchase(timestamp){
+  if(confirm("⚠️ هل أنت متأكد من إلغاء هذا الشراء؟")){
+    purchases=purchases.filter(p=>p.timestamp!=timestamp);
+    localStorage.setItem('purchases', JSON.stringify(purchases));
+    alert("✅ تم إلغاء الشراء بنجاح.");
+    location.reload();
   }
 }
 </script>
