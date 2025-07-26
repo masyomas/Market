@@ -66,7 +66,7 @@ async function loadAndRender(){
     userPurchases.forEach((p)=>{
       let prod=products.find(prod=>prod.name===p.product || prod.name===p.name);
       let timestamp=Number(p.timestamp);
-      let lastTime = isNaN(timestamp) ? 'غير معروف' : new Date(timestamp).toLocaleString('ar-EG');
+      let lastTime = isNaN(timestamp) ? p.timestamp : new Date(timestamp).toLocaleString('ar-EG');
       totalPaid+=p.price*p.qty;
 
       html+=`
@@ -90,8 +90,30 @@ async function loadAndRender(){
 
 function cancelPurchase(timestamp){
   let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
+  let removed=purchases.find(p=>String(p.timestamp)===String(timestamp));
+
+  // إزالة من المشتريات
   purchases=purchases.filter(p=>String(p.timestamp)!==String(timestamp));
   localStorage.setItem('purchases', JSON.stringify(purchases));
+
+  // إرسال إلغاء الشراء إلى Formspree
+  if(removed){
+    fetch("https://formspree.io/f/xovldbwb", {
+      method: "POST",
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        type: "cancel",
+        name: logged.name,
+        phone: logged.phone,
+        code: logged.code,
+        product: removed.product,
+        qty: removed.qty,
+        price: removed.price,
+        timestamp: removed.timestamp
+      })
+    });
+  }
+
   alert("✅ تم إلغاء الشراء بنجاح.");
   location.reload();
 }
