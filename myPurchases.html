@@ -64,20 +64,21 @@ async function loadAndRender(){
 
     let html="";
     userPurchases.forEach((p)=>{
-      let prod=products.find(prod=>prod.name===p.product); 
-      let lastTime=new Date(p.timestamp).toLocaleString('ar-EG');
+      let prod=products.find(prod=>prod.name===p.product || prod.name===p.name);
+      let timestamp=Number(p.timestamp);
+      let lastTime = isNaN(timestamp) ? 'غير معروف' : new Date(timestamp).toLocaleString('ar-EG');
       totalPaid+=p.price*p.qty;
 
-      let canCancel=(Date.now()-p.timestamp)<21600000; // أقل من 6 ساعات
+      let canCancel = (Date.now()-timestamp)<21600000; // قبل 6 ساعات
 
       html+=`
       <div class="item clearfix">
-        <img src="${prod?.img || p.image || 'https://via.placeholder.com/80'}" alt="${prod?.name || p.product}">
+        <img src="${prod?.img || p.image || 'https://via.placeholder.com/80'}" alt="${prod?.name || p.product || p.name}">
         <div class="item-details">
-          <div><b>${prod?.name || p.product}</b></div>
+          <div><b>${prod?.name || p.product || p.name}</b></div>
           <div>📅 التاريخ: ${lastTime}</div>
           <div>💰 السعر: ${p.price} × ${p.qty} = ${p.price*p.qty} جنيه</div>
-          ${canCancel ? `<button class="cancelBtn" onclick="cancelPurchase(${p.timestamp})">إلغاء الشراء</button>`:""}
+          ${canCancel ? `<button class="cancelBtn" onclick="cancelPurchase('${p.timestamp}')">إلغاء الشراء</button>` : ''}
         </div>
       </div>`;
     });
@@ -90,12 +91,11 @@ async function loadAndRender(){
 }
 
 function cancelPurchase(timestamp){
-  if(confirm("⚠️ هل أنت متأكد أنك تريد إلغاء هذا الشراء؟")){
-    purchases=purchases.filter(p=>p.timestamp!=timestamp);
-    localStorage.setItem('purchases', JSON.stringify(purchases));
-    alert("✅ تم إلغاء الشراء بنجاح.");
-    loadAndRender();
-  }
+  let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
+  purchases=purchases.filter(p=>String(p.timestamp)!==String(timestamp));
+  localStorage.setItem('purchases', JSON.stringify(purchases));
+  alert("✅ تم إلغاء الشراء بنجاح.");
+  location.reload();
 }
 </script>
 
