@@ -43,27 +43,93 @@ let logged=JSON.parse(localStorage.getItem('loggedUser'));
 let users=JSON.parse(localStorage.getItem('users')||"[]");
 let products=JSON.parse(localStorage.getItem('products')||"[]");
 let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
-let bonus=parseFloat(localStorage.getItem('bonus')||"1");
 
 function renderAdmin(){
   if(!logged || logged.role!=="superadmin"){
     document.getElementById('adminSection').innerHTML='<p>🚫 لا تملك صلاحية الدخول هنا.</p>';
     return;
   }
+
+  // احصائيات
+  let activeUser = logged; // المسجل دخوله حاليًا
+  let totalUsers = users.filter(u=>u.role=="user").length;
+  let usersWithPurchases = users.filter(u => 
+    u.role=="user" && purchases.some(p=>p.code==u.code)
+  ).length;
+  let usersWithoutPurchases = users.filter(u => 
+    u.role=="user" && !purchases.some(p=>p.code==u.code)
+  );
+
   let html=`
-  <h3>مرحبًا ${logged.name}</h3>
+  <h3>👋 مرحبًا ${logged.name}</h3>
   <button class="logoutBtn" onclick="logout()">تسجيل خروج</button>
 
-  <h3>إضافة سلعة جديدة</h3>
+  <h3>📊 ملخص سريع</h3>
+  <div>✅ المستخدم النشط حاليًا: ${activeUser.name} (${activeUser.role})</div>
+  <div>👥 إجمالي المستخدمين المسجلين: ${totalUsers}</div>
+  <div>🛒 المستخدمين الذين اشتروا مرة واحدة على الأقل: ${usersWithPurchases}</div>
+  <div>📦 المستخدمين المسجلين بدون شراء: ${usersWithoutPurchases.length}</div>
+  
+  <h3>👥 جميع المستخدمين</h3>`;
+  if(users.length){
+    html+=`<table>
+    <tr><th>الاسم</th><th>الدور</th><th>الهاتف</th><th>الكود</th></tr>`;
+    users.forEach(u=>{
+      html+=`<tr>
+      <td>${u.name}</td>
+      <td>${u.role}</td>
+      <td>${u.phone}</td>
+      <td>${u.code}</td></tr>`;
+    });
+    html+=`</table>`;
+  }else{ html+=`<p>⚠️ لا يوجد مستخدمون.</p>`; }
+
+  html+=`<h3>📝 المستخدمين المسجلين بدون شراء</h3>`;
+  if(usersWithoutPurchases.length){
+    html+=`<table>
+    <tr><th>الاسم</th><th>رقم الهاتف</th><th>الكود</th></tr>`;
+    usersWithoutPurchases.forEach(u=>{
+      html+=`<tr>
+      <td>${u.name}</td>
+      <td>${u.phone}</td>
+      <td>${u.code}</td></tr>`;
+    });
+    html+=`</table>`;
+  }else{
+    html+=`<p>✔️ جميع المستخدمين قاموا بعملية شراء واحدة على الأقل.</p>`;
+  }
+
+  html+=`<h3>📦 سجل المبيعات</h3>`;
+  if(purchases.length){
+    html+=`<table>
+    <tr><th>السلعة</th><th>العميل</th><th>الكود</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th><th>التاريخ</th></tr>`;
+    purchases.forEach(p=>{
+      let subtotal = p.qty * p.price;
+      html+=`<tr>
+      <td>${p.product}</td>
+      <td>${p.name||'غير معرف'}</td>
+      <td>${p.code}</td>
+      <td>${p.qty}</td>
+      <td>${p.price}</td>
+      <td>${subtotal}</td>
+      <td>${p.timestamp||'—'}</td></tr>`;
+    });
+    html+=`</table>
+    <button onclick="clearAll()">🧹 مسح كل المبيعات</button>`;
+  }else{
+    html+=`<p>📭 لا توجد مبيعات بعد.</p>`;
+  }
+
+  html+=`<h3>➕ إضافة سلعة جديدة</h3>
   <input type="text" id="pName" placeholder="اسم السلعة">
   <input type="number" id="pPrice" placeholder="سعر السلعة">
   <input type="text" id="pDetails" placeholder="تفاصيل السلعة">
   <input type="file" id="pImg">
-  <button onclick="addProduct()">إضافة</button>
+  <button onclick="addProduct()">إضافة</button>`;
 
-  <h3>السلع المضافة</h3>`;
   if(products.length){
-    html+=`<table>
+    html+=`<h3>📦 السلع المضافة</h3>
+    <table>
     <tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>تفاصيل</th><th>حذف</th></tr>`;
     products.forEach((p,i)=>{
       html+=`<tr>
@@ -74,28 +140,6 @@ function renderAdmin(){
       <td><button onclick="delProduct(${i})">🗑️</button></td></tr>`;
     });
     html+=`</table>`;
-  }else{ html+=`<p>لا توجد سلع بعد.</p>`; }
-
-  html+=`<h3>📦 سجل المبيعات</h3>`;
-  if(purchases.length){
-    html+=`<table>
-    <tr><th>السلعة</th><th>العميل</th><th>رقم الهاتف</th><th>الكود</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th><th>التاريخ</th></tr>`;
-    purchases.forEach(p=>{
-      let subtotal = p.qty * p.price;
-      html+=`<tr>
-      <td>${p.product}</td>
-      <td>${p.name||'غير معرف'}</td>
-      <td>${p.phone||'غير معرف'}</td>
-      <td>${p.code}</td>
-      <td>${p.qty}</td>
-      <td>${p.price}</td>
-      <td>${subtotal}</td>
-      <td>${p.date||'—'}</td></tr>`;
-    });
-    html+=`</table>
-    <button onclick="clearAll()">🧹 مسح كل المبيعات</button>`;
-  }else{
-    html+=`<p>لا توجد مبيعات بعد.</p>`;
   }
 
   html+=`<h3>🧾 إصدار فاتورة</h3>
@@ -158,7 +202,6 @@ function showInvoice(){
   if(!u) return;
 
   let userPurchases=purchases.filter(p=>p.code==code);
-  // نجمع الأصناف بدون مشاكل اللغة
   let grouped=[];
   userPurchases.forEach(p=>{
     let exist=grouped.find(g=>g.product==p.product && g.price==p.price);
