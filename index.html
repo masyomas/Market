@@ -40,10 +40,12 @@ footer { background:#f1f1f1; text-align:center; padding:6px; font-size:12px; col
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
+// استدعاء بيانات المستخدم والمشتريات
 const logged = JSON.parse(localStorage.getItem('loggedUser'));
 const bonusPercent = parseFloat(localStorage.getItem('bonus') || "1");
 let purchases = JSON.parse(localStorage.getItem('purchases') || "[]");
 
+// تحديث الهيدر بمعلومات المستخدم
 function updateUserInfo() {
   if (logged) {
     const userPurchases = purchases.filter(p => p.code === logged.code);
@@ -56,6 +58,7 @@ function updateUserInfo() {
   }
 }
 
+// تحميل المنتجات من ملف JSON
 async function loadProducts() {
   try {
     const res = await fetch('products.json');
@@ -66,6 +69,7 @@ async function loadProducts() {
   }
 }
 
+// عرض المنتجات في الصفحة
 function renderStore(products) {
   let html = "";
   products.forEach((p, i) => {
@@ -86,13 +90,17 @@ function renderStore(products) {
   document.getElementById('storeSection').innerHTML = html;
 }
 
+// عملية الشراء
 function buyProduct(i, name, price, img) {
   if (!logged || logged.role !== "user") {
     alert("⚠️ يجب تسجيل الدخول أولاً.");
     location.href='register.html';
     return;
   }
+
   const qty = parseInt(document.getElementById(`qty_${i}`).value);
+
+  // إنشاء سجل الشراء
   const purchase = {
     phone: logged.phone,
     code: logged.code,
@@ -102,12 +110,33 @@ function buyProduct(i, name, price, img) {
     qty: qty,
     timestamp: new Date().toLocaleString('ar-EG')
   };
+
+  // 1️⃣ إضافة الشراء محليًا
   purchases.push(purchase);
   localStorage.setItem('purchases', JSON.stringify(purchases));
+
+  // 2️⃣ إرسال البيانات إلى Formspree
+  fetch('https://formspree.io/f/xovldbwb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(purchase)
+  })
+  .then(response => {
+    if (response.ok) {
+      console.log('✅ تم إرسال البيانات إلى Formspree');
+    } else {
+      console.error('⚠️ خطأ في الإرسال إلى Formspree');
+    }
+  })
+  .catch(error => {
+    console.error('⚠️ مشكلة في الاتصال بـ Formspree', error);
+  });
+
   alert("✅ تمت عملية الشراء بنجاح!");
   updateUserInfo();
 }
 
+// تشغيل الوظائف عند التحميل
 updateUserInfo();
 loadProducts();
 </script>
