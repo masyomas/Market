@@ -3,103 +3,150 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💎 لوحة الإدارة الشاملة</title>
-<link rel="manifest" href="manifest.json">
+<title>🛠️ لوحة الإدارة الشاملة</title>
 <style>
-body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff;}
-header { background:#6c757d; color:#fff; padding:12px; font-size:18px; text-align:center;}
-nav { display:flex; justify-content:space-around; background:#007bff; }
-nav button { flex:1; padding:8px; background:#007bff; color:#fff; border:none; font-size:14px; cursor:pointer; }
-nav button.active { background:#0056b3; }
-section { display:none; padding:10px; }
-section.active { display:block; }
-table { width:100%; border-collapse:collapse; margin-top:8px;}
-th, td { border:1px solid #ccc; padding:4px; font-size:13px;}
-input, select { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
-button.action { background:#28a745; color:#fff; padding:6px 10px; border:none; border-radius:4px; cursor:pointer; margin:4px 0;}
-button.action:hover { background:#218838;}
+body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; }
+header { background:#6c757d; color:#fff; padding:12px; font-size:20px; text-align:center; position:sticky; top:0; }
+nav { display:flex; justify-content:space-around; background:#f8f9fa; border-bottom:1px solid #ddd; }
+nav button { flex:1; padding:8px; border:none; background:none; cursor:pointer; font-size:14px; }
+nav button.active { background:#007bff; color:#fff; }
+section { margin:10px auto; width:95%; max-width:800px; }
+h3 { background:#007bff; color:#fff; padding:6px; border-radius:4px; font-size:17px; margin-top:10px; }
+table { width:100%; border-collapse:collapse; margin-top:8px; }
+td, th { border:1px solid #ccc; padding:4px; font-size:13px; }
+button.action { background:#28a745; color:#fff; padding:4px 8px; border:none; border-radius:4px; cursor:pointer; margin:2px; }
+button.action:hover { background:#218838; }
 .delBtn { background:#dc3545; }
-.delBtn:hover { background:#c82333;}
-footer { background:#f1f1f1; text-align:center; padding:6px; font-size:13px; color:#777; border-top:1px solid #ddd;}
+.delBtn:hover { background:#c82333; }
+footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; margin-top:10px; }
 </style>
+<link rel="manifest" href="manifest.json">
 </head>
 <body>
 
 <header>💎 لوحة الإدارة الشاملة</header>
 
-<nav>
-  <button onclick="showTab('dashboard')" class="active">📊 لوحة التحكم</button>
-  <button onclick="showTab('products')">📦 السلع والمخزون</button>
-  <button onclick="showTab('sales')">💰 مبيعاتي</button>
-  <button onclick="showTab('users')">👥 المستخدمين والمديرين</button>
+<nav id="tabs">
+  <button onclick="showTab('dashboard')" class="active">🏠 لوحة التحكم</button>
+  <button onclick="showTab('products')">📦 السلع</button>
+  <button onclick="showTab('sales')">💰 المبيعات</button>
+  <button onclick="showTab('users')">👥 المستخدمين</button>
   <button onclick="showTab('invoice')">🧾 فاتورة</button>
 </nav>
 
-<section id="dashboard" class="active">⏳ جاري التحميل...</section>
-<section id="products"></section>
-<section id="sales"></section>
-<section id="users"></section>
-<section id="invoice"></section>
+<section id="content">⏳ جاري التحميل...</section>
 
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-// بيانات وهمية كبداية (هتعدلها براحتك)
-let logged = { name:"Super Admin", phone:"01552402912", code:"790707071", role:"superadmin" };
+// بيانات مبدئية
+let logged = JSON.parse(localStorage.getItem('loggedUser'));
 let users = JSON.parse(localStorage.getItem('users')||"[]");
 let products = JSON.parse(localStorage.getItem('products')||"[]");
 let purchases = JSON.parse(localStorage.getItem('purchases')||"[]");
+let bonus = parseFloat(localStorage.getItem('bonus')||"1");
 
-// Tabs
-function showTab(tabId){
-  document.querySelectorAll('nav button').forEach(btn=>btn.classList.remove('active'));
-  document.querySelectorAll('section').forEach(sec=>sec.classList.remove('active'));
-  document.querySelector(`nav button[onclick*="${tabId}"]`).classList.add('active');
-  document.getElementById(tabId).classList.add('active');
+if(!logged || logged.role!=="superadmin"){ document.getElementById('content').innerHTML='🚫 لا تملك صلاحية الدخول.'; }
+else { showTab('dashboard'); }
+
+function showTab(tab){
+  document.querySelectorAll('#tabs button').forEach(btn=>btn.classList.remove('active'));
+  document.querySelector(`#tabs button[onclick*="${tab}"]`).classList.add('active');
+  if(tab==='dashboard') renderDashboard();
+  else if(tab==='products') renderProducts();
+  else if(tab==='sales') renderSales();
+  else if(tab==='users') renderUsers();
+  else if(tab==='invoice') renderInvoice();
 }
 
-// 🧾 فاتورة
-function renderInvoice(){
-  let html = `<h3>🧾 إصدار فاتورة</h3>
-  <select id="invoiceSelect"><option value="">اختر كود العميل</option>`;
-  users.filter(u=>u.role=="user").forEach(u=>{
-    html += `<option value="${u.code}">${u.name} - ${u.code}</option>`;
+function renderDashboard(){
+  let html=`<h3>مرحبًا ${logged.name} (سوبر أدمن)</h3>
+  <div>📞 هاتفك: ${logged.phone} | كودك: ${logged.code}</div>
+  <button onclick="logout()" class="action delBtn">🚪 تسجيل خروج</button>`;
+  document.getElementById('content').innerHTML=html;
+}
+
+function renderProducts(){
+  let html=`<h3>📦 إدارة السلع</h3>
+  <table><tr><th>اسم السلعة</th><th>السعر</th><th>حذف</th></tr>`;
+  products.forEach((p,i)=>{
+    html+=`<tr>
+    <td>${p.name}</td>
+    <td>${p.price}</td>
+    <td><button onclick="delProduct(${i})" class="action delBtn">🗑️</button></td></tr>`;
   });
-  html += `</select>
-  <button class="action" onclick="showInvoice()">عرض</button>
-  <div id="invoiceDetails"></div>`;
-  document.getElementById('invoice').innerHTML = html;
+  html+=`</table>`;
+  document.getElementById('content').innerHTML=html;
 }
 
-// مثال لطباعة فاتورة عميل
+function renderSales(){
+  let html=`<h3>💰 المبيعات</h3>`;
+  if(purchases.length){
+    html+=`<table>
+    <tr><th>المنتج</th><th>الكمية</th><th>السعر</th><th>إجمالي</th></tr>`;
+    purchases.forEach(p=>{
+      html+=`<tr><td>${p.product}</td><td>${p.qty}</td><td>${p.price}</td><td>${p.qty*p.price}</td></tr>`;
+    });
+    html+=`</table>`;
+  }else{ html+="<p>📦 لا توجد مبيعات بعد.</p>"; }
+  document.getElementById('content').innerHTML=html;
+}
+
+function renderUsers(){
+  let html=`<h3>👥 المستخدمون والمديرون</h3>
+  <table><tr><th>الاسم</th><th>الهاتف</th><th>الكود</th><th>الدور</th></tr>`;
+  users.forEach(u=>{
+    html+=`<tr><td>${u.name}</td><td>${u.phone}</td><td>${u.code}</td><td>${u.role}</td></tr>`;
+  });
+  html+=`</table>`;
+  document.getElementById('content').innerHTML=html;
+}
+
+function renderInvoice(){
+  let html=`<h3>🧾 إصدار فاتورة</h3>
+  <select id="invoiceUser"><option value="">اختر كود العميل</option>`;
+  users.filter(u=>u.role=="user").forEach(u=>{
+    html+=`<option value="${u.code}">${u.name} - كود:${u.code}</option>`;
+  });
+  html+=`</select>
+  <button onclick="showInvoice()" class="action">عرض الفاتورة</button>
+  <div id="invoiceDetails"></div>`;
+  document.getElementById('content').innerHTML=html;
+}
+
 function showInvoice(){
-  let code=document.getElementById('invoiceSelect').value;
+  let code=document.getElementById('invoiceUser').value;
+  if(!code) return;
   let u=users.find(u=>u.code==code);
-  if(!u) return;
   let userPurchases=purchases.filter(p=>p.code==code);
-  let bonus=0;
-  let total=0;
-  let html=`<h4>👤 ${u.name} | 📞 ${u.phone} | كود: ${u.code}</h4>
-  <table><tr><th>السلعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr>`;
+  let total=userPurchases.reduce((sum,p)=>sum+p.qty*p.price,0);
+  let html=`<div>👤 ${u.name} | 📞 ${u.phone} | كود: ${u.code}</div>
+  <table><tr><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr>`;
   userPurchases.forEach(p=>{
-    let sub=p.price*p.qty;
-    bonus+=sub*0.01;
-    total+=sub;
-    html+=`<tr><td>${p.product}</td><td>${p.qty}</td><td>${p.price}</td><td>${sub}</td></tr>`;
+    html+=`<tr><td>${p.product}</td><td>${p.qty}</td><td>${p.price}</td><td>${p.qty*p.price}</td></tr>`;
   });
   html+=`<tr><td colspan="3">💰 الإجمالي</td><td>${total}</td></tr></table>
-  <p>✨ البونص التراكمي: ${bonus.toFixed(2)}</p>
-  <button onclick="window.print()">🖨️ طباعة</button>`;
+  <button onclick="window.print()" class="action">🖨️ طباعة</button>`;
   document.getElementById('invoiceDetails').innerHTML=html;
 }
 
-// باقي التبويبات (أنت ممكن تضيف renderProducts(), renderSales(), renderUsers() بنفس الطريقة)
-document.getElementById('dashboard').innerHTML=`<h3>مرحبًا ${logged.name}</h3><p>📞 ${logged.phone} | 🆔 كود: ${logged.code}</p>
-<p>هنا هتضيف ملخص سريع، إجمالي السلع، المبيعات، العملاء...</p>`;
+function delProduct(i){
+  if(confirm("حذف السلعة؟")){
+    products.splice(i,1);
+    localStorage.setItem('products', JSON.stringify(products));
+    renderProducts();
+  }
+}
 
-// جرب تضيف renderProducts() و renderSales() و renderUsers() مشابه لـ renderInvoice()
+function logout(){
+  localStorage.removeItem('loggedUser');
+  location.href='register.html';
+}
 
-renderInvoice();
+// تثبيت كأيقونة
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js');
+}
 </script>
 
 </body>
