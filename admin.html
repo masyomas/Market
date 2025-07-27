@@ -19,9 +19,8 @@ button:hover { background:#218838;}
 .delBtn { background:#dc3545; }
 .delBtn:hover { background:#c82333;}
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px;}
-input[type=text], input[type=password] { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
+input[type=text], input[type=password], input[type=number] { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
 label { display:block; font-size:13px; margin-top:4px;}
-/* طباعة الفاتورة فقط */
 @media print {
   body * { visibility:hidden; }
   #invoicePrintArea, #invoicePrintArea * { visibility:visible; }
@@ -47,6 +46,7 @@ label { display:block; font-size:13px; margin-top:4px;}
 let logged = JSON.parse(localStorage.getItem('loggedUser'));
 let users = JSON.parse(localStorage.getItem('users') || "[]");
 let purchases = JSON.parse(localStorage.getItem('purchases') || "[]");
+let bonus = parseFloat(localStorage.getItem('bonus') || "5"); // نسبة البونص الافتراضية 5%
 
 function renderAdmin(){
   if(!logged || logged.role !== "superadmin"){
@@ -58,7 +58,12 @@ function renderAdmin(){
   <div>📞 هاتفك: ${logged.phone} | 🆔 كودك: ${logged.code}</div>
   <button onclick="logout()">🚪 تسجيل خروج</button>`;
 
-  // إضافة مدير
+  // عرض وتعديل نسبة البونص
+  html += `<h3>🏅 نسبة البونص الحالية: ${bonus}%</h3>
+    <input type="number" id="bonusInput" placeholder="أدخل نسبة جديدة (مثلاً 5)" value="${bonus}">
+    <button onclick="updateBonus()">تعديل النسبة</button>`;
+
+  // باقي المحتوى كما هو (إضافة مديرين، عرض المستخدمين، المبيعات، الفاتورة)
   html += `<h3>➕ إضافة مدير جديد مع صلاحيات</h3>
     <input type="text" id="adminName" placeholder="اسم المدير">
     <input type="text" id="adminPhone" placeholder="رقم الهاتف">
@@ -77,9 +82,8 @@ function renderAdmin(){
   users.forEach(u=>{
     html += `<tr><td>${u.name}</td><td>${u.phone}</td><td>${u.code}</td><td>${u.role}</td></tr>`;
   });
-  html += `</table>`;
-
-  html += `<button class="delBtn" onclick="clearUsers()">🧹 مسح كل المستخدمين عدا سوبر أدمن</button>`;
+  html += `</table>
+    <button class="delBtn" onclick="clearUsers()">🧹 مسح كل المستخدمين عدا سوبر أدمن</button>`;
 
   // المبيعات
   html += `<h3>💰 جميع المبيعات</h3>`;
@@ -101,10 +105,9 @@ function renderAdmin(){
   }else{
     html += `<p>📦 لا توجد مبيعات بعد.</p>`;
   }
-
   html += `<button class="delBtn" onclick="clearPurchases()">🧹 مسح كل المبيعات (مع كلمة سر)</button>`;
 
-  // إصدار فاتورة
+  // الفاتورة
   html += `<h3>🧾 إصدار فاتورة لعميل</h3>
     <select id="invoiceSelect">
       <option value="">اختر كود العميل</option>`;
@@ -116,6 +119,15 @@ function renderAdmin(){
     <div id="invoicePrintArea"></div>`;
 
   document.getElementById('adminContent').innerHTML = html;
+}
+
+function updateBonus(){
+  let newBonus = parseFloat(document.getElementById('bonusInput').value);
+  if(isNaN(newBonus) || newBonus<0){ alert("❗ أدخل نسبة صحيحة."); return; }
+  bonus = newBonus;
+  localStorage.setItem('bonus', bonus);
+  alert("✅ تم تحديث نسبة البونص.");
+  renderAdmin();
 }
 
 function addAdmin(){
@@ -173,24 +185,26 @@ function showInvoice(){
     else{ grouped.push({product:p.product, qty:p.qty, price:p.price}); }
   });
 
-  let bonus = grouped.reduce((sum,item)=>sum+item.qty,0); // مثال لحساب البونص بعدد القطع
   let total=0;
+  grouped.forEach(item=>{ total+=item.qty*item.price; });
+  let bonusAmount = total*(bonus/100);
 
   let html=`<div style="margin-top:10px; text-align:right;">
   <h3>🛍️ Almasa Store</h3>
   <div>👤 الاسم: ${u.name}</div>
   <div>📞 الهاتف: ${u.phone}</div>
   <div>🧾 الكود: ${u.code}</div>
-  <div>🏅 البونص: ${bonus}</div>
+  <div>🏅 البونص (${bonus}%): ${bonusAmount.toFixed(2)}</div>
   <div>📅 التاريخ: ${new Date().toLocaleString('ar-EG')}</div>
   <table>
   <tr><th>السلعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr>`;
   grouped.forEach(item=>{
     let subtotal=item.qty*item.price;
-    total+=subtotal;
     html+=`<tr><td>${item.product}</td><td>${item.qty}</td><td>${item.price}</td><td>${subtotal}</td></tr>`;
   });
-  html+=`<tr><td colspan="3">💰 الإجمالي</td><td>${total}</td></tr></table>
+  html+=`<tr><td colspan="3">💰 الإجمالي</td><td>${total}</td></tr>
+  <tr><td colspan="3">🏅 قيمة البونص</td><td>${bonusAmount.toFixed(2)}</td></tr>
+  </table>
   <footer style="margin-top:10px;">💎 Powered by Almasa 💎</footer>
   <button onclick="window.print()">🖨️ طباعة الفاتورة</button>
   </div>`;
