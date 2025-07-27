@@ -21,6 +21,12 @@ button:hover { background:#218838;}
 footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px;}
 input[type=text], input[type=password] { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
 label { display:block; font-size:13px; margin-top:4px;}
+/* طباعة الفاتورة فقط */
+@media print {
+  body * { visibility:hidden; }
+  #invoicePrintArea, #invoicePrintArea * { visibility:visible; }
+  #invoicePrintArea { position:absolute; top:0; right:0; left:0; }
+}
 </style>
 </head>
 <body>
@@ -52,7 +58,7 @@ function renderAdmin(){
   <div>📞 هاتفك: ${logged.phone} | 🆔 كودك: ${logged.code}</div>
   <button onclick="logout()">🚪 تسجيل خروج</button>`;
 
-  // إضافة مدير جديد
+  // إضافة مدير
   html += `<h3>➕ إضافة مدير جديد مع صلاحيات</h3>
     <input type="text" id="adminName" placeholder="اسم المدير">
     <input type="text" id="adminPhone" placeholder="رقم الهاتف">
@@ -107,7 +113,7 @@ function renderAdmin(){
   });
   html += `</select>
     <button onclick="showInvoice()">عرض الفاتورة</button>
-    <div id="invoiceDetails"></div>`;
+    <div id="invoicePrintArea"></div>`;
 
   document.getElementById('adminContent').innerHTML = html;
 }
@@ -167,23 +173,28 @@ function showInvoice(){
     else{ grouped.push({product:p.product, qty:p.qty, price:p.price}); }
   });
 
-  let html=`<div style="margin-top:10px;">
+  let bonus = grouped.reduce((sum,item)=>sum+item.qty,0); // مثال لحساب البونص بعدد القطع
+  let total=0;
+
+  let html=`<div style="margin-top:10px; text-align:right;">
+  <h3>🛍️ Almasa Store</h3>
   <div>👤 الاسم: ${u.name}</div>
   <div>📞 الهاتف: ${u.phone}</div>
   <div>🧾 الكود: ${u.code}</div>
+  <div>🏅 البونص: ${bonus}</div>
   <div>📅 التاريخ: ${new Date().toLocaleString('ar-EG')}</div>
   <table>
   <tr><th>السلعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr>`;
-  let total=0;
   grouped.forEach(item=>{
     let subtotal=item.qty*item.price;
     total+=subtotal;
     html+=`<tr><td>${item.product}</td><td>${item.qty}</td><td>${item.price}</td><td>${subtotal}</td></tr>`;
   });
   html+=`<tr><td colspan="3">💰 الإجمالي</td><td>${total}</td></tr></table>
+  <footer style="margin-top:10px;">💎 Powered by Almasa 💎</footer>
   <button onclick="window.print()">🖨️ طباعة الفاتورة</button>
   </div>`;
-  document.getElementById('invoiceDetails').innerHTML=html;
+  document.getElementById('invoicePrintArea').innerHTML=html;
 }
 
 function logout(){
