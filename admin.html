@@ -3,187 +3,103 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💎 لوحة الإدارة</title>
+<title>💎 لوحة الإدارة الشاملة</title>
 <link rel="manifest" href="manifest.json">
 <style>
-body { font-family:'Tahoma',sans-serif; margin:0; background:#fff;}
-header { background:#6c757d; color:#fff; padding:10px; font-size:18px; text-align:center; position:sticky; top:0; z-index:10;}
-nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:6px; border-top:1px solid #ddd; border-bottom:1px solid #ddd;}
-nav a { text-decoration:none; color:#333; font-size:14px;}
-nav a:hover { color:#007bff;}
-section { margin:10px auto; width:95%; max-width:900px;}
-h3 { background:#007bff; color:#fff; padding:6px; border-radius:4px; font-size:16px; margin-top:10px;}
+body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff;}
+header { background:#6c757d; color:#fff; padding:12px; font-size:18px; text-align:center;}
+nav { display:flex; justify-content:space-around; background:#007bff; }
+nav button { flex:1; padding:8px; background:#007bff; color:#fff; border:none; font-size:14px; cursor:pointer; }
+nav button.active { background:#0056b3; }
+section { display:none; padding:10px; }
+section.active { display:block; }
 table { width:100%; border-collapse:collapse; margin-top:8px;}
-td, th { border:1px solid #ccc; padding:4px; font-size:13px;}
-button { background:#28a745; color:#fff; padding:4px 8px; border:none; border-radius:4px; cursor:pointer; margin:3px;}
-button:hover { background:#218838;}
+th, td { border:1px solid #ccc; padding:4px; font-size:13px;}
+input, select { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
+button.action { background:#28a745; color:#fff; padding:6px 10px; border:none; border-radius:4px; cursor:pointer; margin:4px 0;}
+button.action:hover { background:#218838;}
 .delBtn { background:#dc3545; }
 .delBtn:hover { background:#c82333;}
-input[type=text], input[type=number], input[type=password], select { width:95%; padding:6px; margin:4px 0; border:1px solid #ccc; border-radius:4px;}
-label { font-size:13px; }
-footer { background:#f1f1f1; text-align:center; padding:6px; font-size:12px; color:#777; border-top:1px solid #ddd; margin-top:10px;}
+footer { background:#f1f1f1; text-align:center; padding:6px; font-size:13px; color:#777; border-top:1px solid #ddd;}
 </style>
 </head>
 <body>
 
-<header>💎 لوحة الإدارة | <a href="index.html">🏪 المتجر</a></header>
+<header>💎 لوحة الإدارة الشاملة</header>
 
 <nav>
-  <a href="admin.html">🛠️ الإدارة</a>
-  <a href="mySales.html">📊 مبيعاتي</a>
-  <a href="register.html">🔑 حسابي</a>
+  <button onclick="showTab('dashboard')" class="active">📊 لوحة التحكم</button>
+  <button onclick="showTab('products')">📦 السلع والمخزون</button>
+  <button onclick="showTab('sales')">💰 مبيعاتي</button>
+  <button onclick="showTab('users')">👥 المستخدمين والمديرين</button>
+  <button onclick="showTab('invoice')">🧾 فاتورة</button>
 </nav>
 
-<section id="adminContent">⏳ جاري التحميل...</section>
+<section id="dashboard" class="active">⏳ جاري التحميل...</section>
+<section id="products"></section>
+<section id="sales"></section>
+<section id="users"></section>
+<section id="invoice"></section>
 
 <footer>💎 Powered by Almasa 💎</footer>
 
 <script>
-// بيانات أساسية
-let logged=JSON.parse(localStorage.getItem('loggedUser'));
-let users=JSON.parse(localStorage.getItem('users')||"[]");
-let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
-let products=JSON.parse(localStorage.getItem('products')||"[]");
+// بيانات وهمية كبداية (هتعدلها براحتك)
+let logged = { name:"Super Admin", phone:"01552402912", code:"790707071", role:"superadmin" };
+let users = JSON.parse(localStorage.getItem('users')||"[]");
+let products = JSON.parse(localStorage.getItem('products')||"[]");
+let purchases = JSON.parse(localStorage.getItem('purchases')||"[]");
 
-// رندر الصفحة
-function renderAdmin(){
-  if(!logged || logged.role!=="superadmin"){
-    document.getElementById('adminContent').innerHTML='<p>🚫 لا تملك صلاحية الدخول.</p>';
-    return;
-  }
+// Tabs
+function showTab(tabId){
+  document.querySelectorAll('nav button').forEach(btn=>btn.classList.remove('active'));
+  document.querySelectorAll('section').forEach(sec=>sec.classList.remove('active'));
+  document.querySelector(`nav button[onclick*="${tabId}"]`).classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
 
-  let html=`
-  <h3>مرحبًا ${logged.name}</h3>
-  <button onclick="logout()">🚪 تسجيل خروج</button>
-
-  <h3>➕ إضافة مدير جديد</h3>
-  <input type="text" id="adminName" placeholder="اسم المدير">
-  <input type="text" id="adminPhone" placeholder="رقم الهاتف">
-  <input type="password" id="adminPass" placeholder="كلمة المرور">
-  <button onclick="addAdmin()">إضافة مدير</button>
-
-  <h3>📦 إدارة المخزون</h3>
-  <input type="text" id="pName" placeholder="اسم السلعة">
-  <input type="number" id="pQty" placeholder="الكمية">
-  <input type="number" id="pPrice" placeholder="سعر الوحدة">
-  <button onclick="addProduct()">إضافة سلعة</button>
-  <table>
-  <tr><th>الاسم</th><th>الكمية</th><th>السعر</th><th>حذف</th></tr>`;
-  products.forEach((p,i)=>{
-    html+=`<tr>
-      <td>${p.name}</td>
-      <td>${p.qty}</td>
-      <td>${p.price}</td>
-      <td><button class="delBtn" onclick="delProduct(${i})">🗑️</button></td>
-    </tr>`;
-  });
-  html+=`</table>
-
-  <h3>🧾 إصدار فاتورة</h3>
-  <select id="invoiceSelect">
-    <option value="">اختر كود العميل</option>`;
+// 🧾 فاتورة
+function renderInvoice(){
+  let html = `<h3>🧾 إصدار فاتورة</h3>
+  <select id="invoiceSelect"><option value="">اختر كود العميل</option>`;
   users.filter(u=>u.role=="user").forEach(u=>{
-    html+=`<option value="${u.code}">${u.name} - كود:${u.code}</option>`;
+    html += `<option value="${u.code}">${u.name} - ${u.code}</option>`;
   });
-  html+=`</select>
-  <button onclick="showInvoice()">عرض الفاتورة</button>
-  <div id="invoiceDetails"></div>
-
-  <h3>📊 مبيعاتي</h3>`;
-  // تقرير مبيعات لكل سلعة
-  let salesReport = {};
-  purchases.forEach(p=>{
-    if(!salesReport[p.product]) salesReport[p.product]={qty:0, total:0, price:p.price};
-    salesReport[p.product].qty+=p.qty;
-    salesReport[p.product].total+=p.qty*p.price;
-  });
-  html+=`<table>
-  <tr><th>السلعة</th><th>الكمية المباعة</th><th>سعر الوحدة</th><th>إجمالي المبيعات</th><th>المتبقي</th></tr>`;
-  products.forEach(prod=>{
-    let sold=salesReport[prod.name]?.qty||0;
-    let remaining=prod.qty - sold;
-    html+=`<tr>
-      <td>${prod.name}</td>
-      <td>${sold}</td>
-      <td>${prod.price}</td>
-      <td>${salesReport[prod.name]?.total||0}</td>
-      <td>${remaining}</td>
-    </tr>`;
-  });
-  html+=`</table>`;
-
-  document.getElementById('adminContent').innerHTML=html;
+  html += `</select>
+  <button class="action" onclick="showInvoice()">عرض</button>
+  <div id="invoiceDetails"></div>`;
+  document.getElementById('invoice').innerHTML = html;
 }
 
-// إضافة مدير
-function addAdmin(){
-  let name=document.getElementById('adminName').value.trim();
-  let phone=document.getElementById('adminPhone').value.trim();
-  let pass=document.getElementById('adminPass').value.trim();
-  if(!name||!phone||!pass){ alert("❗ أدخل كل البيانات"); return; }
-  if(users.find(u=>u.phone===phone)){ alert("⚠️ رقم الهاتف مستخدم"); return; }
-  let code=Math.floor(2001+Math.random()*7999);
-  users.push({name,phone,password:pass,code,role:"admin"});
-  localStorage.setItem('users',JSON.stringify(users));
-  alert("✅ تمت إضافة المدير.");
-  renderAdmin();
-}
-
-// إضافة سلعة
-function addProduct(){
-  let name=document.getElementById('pName').value.trim();
-  let qty=parseInt(document.getElementById('pQty').value);
-  let price=parseFloat(document.getElementById('pPrice').value);
-  if(!name||!qty||!price){ alert("❗ أدخل كل البيانات"); return; }
-  products.push({name,qty,price});
-  localStorage.setItem('products',JSON.stringify(products));
-  renderAdmin();
-}
-
-// حذف سلعة
-function delProduct(i){
-  if(confirm("⚠️ حذف السلعة؟")){
-    products.splice(i,1);
-    localStorage.setItem('products',JSON.stringify(products));
-    renderAdmin();
-  }
-}
-
-// طباعة الفاتورة
+// مثال لطباعة فاتورة عميل
 function showInvoice(){
   let code=document.getElementById('invoiceSelect').value;
-  if(!code) return;
   let u=users.find(u=>u.code==code);
+  if(!u) return;
   let userPurchases=purchases.filter(p=>p.code==code);
-  let bonus = userPurchases.reduce((sum,p)=>sum+p.qty,0)*0.1; // مثال بونص
-
-  let html=`<div style="margin-top:10px; text-align:right;">
-  <div>🏪 المتجر: Almasa</div>
-  <div>👤 الاسم: ${u.name}</div>
-  <div>📞 الهاتف: ${u.phone}</div>
-  <div>🧾 الكود: ${u.code}</div>
-  <div>💎 إجمالي البونص: ${bonus.toFixed(2)}</div>
-  <table>
-  <tr><th>السلعة</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr>`;
+  let bonus=0;
   let total=0;
+  let html=`<h4>👤 ${u.name} | 📞 ${u.phone} | كود: ${u.code}</h4>
+  <table><tr><th>السلعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr>`;
   userPurchases.forEach(p=>{
-    let subtotal=p.qty*p.price;
-    total+=subtotal;
-    html+=`<tr><td>${p.product}</td><td>${p.qty}</td><td>${p.price}</td><td>${subtotal}</td></tr>`;
+    let sub=p.price*p.qty;
+    bonus+=sub*0.01;
+    total+=sub;
+    html+=`<tr><td>${p.product}</td><td>${p.qty}</td><td>${p.price}</td><td>${sub}</td></tr>`;
   });
   html+=`<tr><td colspan="3">💰 الإجمالي</td><td>${total}</td></tr></table>
-  <footer>💎 Powered by Almasa 💎</footer>
-  <button onclick="window.print()">🖨️ طباعة</button></div>`;
+  <p>✨ البونص التراكمي: ${bonus.toFixed(2)}</p>
+  <button onclick="window.print()">🖨️ طباعة</button>`;
   document.getElementById('invoiceDetails').innerHTML=html;
 }
 
-// تسجيل خروج
-function logout(){
-  localStorage.removeItem('loggedUser');
-  location.href='register.html';
-}
+// باقي التبويبات (أنت ممكن تضيف renderProducts(), renderSales(), renderUsers() بنفس الطريقة)
+document.getElementById('dashboard').innerHTML=`<h3>مرحبًا ${logged.name}</h3><p>📞 ${logged.phone} | 🆔 كود: ${logged.code}</p>
+<p>هنا هتضيف ملخص سريع، إجمالي السلع، المبيعات، العملاء...</p>`;
 
-renderAdmin();
+// جرب تضيف renderProducts() و renderSales() و renderUsers() مشابه لـ renderInvoice()
+
+renderInvoice();
 </script>
 
 </body>
